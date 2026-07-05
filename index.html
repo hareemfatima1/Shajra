@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شجرہ نسب — خاندان چنجوہ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #8a6f30;
+    --bg-deep: #0d0d0f;
+    --bg-mid: #141418;
+    --bg-card: #1a1a20;
+    --bg-card2: #1f1f28;
+    --border: rgba(201,168,76,0.2);
+    --border-bright: rgba(201,168,76,0.5);
+    --text-primary: #f0e8d5;
+    --text-secondary: #a89878;
+    --text-muted: #6b5f4a;
+    --accent: #c9a84c;
+    --green: #4a8c6a;
+    --green-light: #7dbfa0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'EB Garamond', serif;
+    min-height: 100vh;
+    direction: ltr;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 3rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    background: radial-gradient(ellipse at top, rgba(201,168,76,0.06) 0%, transparent 70%);
+  }
+  .header::before {
+    content: '☽ ✦ ☾';
+    display: block;
+    color: var(--gold-dim);
+    font-size: 1.1rem;
+    letter-spacing: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  .header-title-ur {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    color: var(--gold-light);
+    direction: rtl;
+    line-height: 1.6;
+    margin-bottom: 0.4rem;
+  }
+  .header-title-en {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.75rem, 1.5vw, 1rem);
+    color: var(--text-secondary);
+    letter-spacing: 0.25rem;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .header-meta {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+  .header-meta span { display: flex; align-items: center; gap: 0.4rem; }
+  .header-meta .dot { color: var(--gold-dim); }
+
+  /* ── SEARCH ── */
+  .search-section {
+    max-width: 700px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+  }
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-input {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    color: var(--text-primary);
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 1.1rem;
+    padding: 0.85rem 3.5rem 0.85rem 1.2rem;
+    border-radius: 4px;
+    outline: none;
+    direction: rtl;
+    transition: border-color 0.2s;
+  }
+  .search-input::placeholder { color: var(--text-muted); font-size: 0.95rem; }
+  .search-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.12); }
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--gold-dim);
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+  .search-results {
+    margin-top: 0.5rem;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    display: none;
+  }
+  .search-result-item {
+    padding: 0.75rem 1.2rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    transition: background 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover { background: rgba(201,168,76,0.08); }
+  .sri-name-ur { font-family: 'Noto Nastaliq Urdu'; font-size: 1.05rem; direction: rtl; }
+  .sri-name-en { font-size: 0.8rem; color: var(--text-secondary); font-family: 'EB Garamond'; font-style: italic; }
+  .sri-gen { font-size: 0.75rem; background: rgba(201,168,76,0.15); color: var(--gold); padding: 2px 8px; border-radius: 2px; font-family: 'Cinzel'; }
+
+  /* ── PERSON PROFILE ── */
+  .profile-section {
+    max-width: 860px;
+    margin: 0 auto 3rem;
+    padding: 0 1.5rem;
+    display: none;
+  }
+  .profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .profile-header {
+    padding: 2rem 2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    background: linear-gradient(135deg, rgba(201,168,76,0.05) 0%, transparent 60%);
+  }
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--gold-dim);
+    background: rgba(201,168,76,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel';
+    font-size: 1.4rem;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .profile-names { flex: 1; }
+  .profile-name-ur {
+    font-family: 'Noto Nastaliq Urdu';
+    font-size: 1.7rem;
+    color: var(--gold-light);
+    direction: rtl;
+    line-height: 1.5;
+  }
+  .profile-name-en {
+    font-family: 'Playfair Display';
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+  }
+  .profile-walad {
+    font-family: 'Noto Nastaliq Urdu';
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    direction: rtl;
+    margin-top: 0.4rem;
+  }
+  .profile-badge {
+    background: rgba(201,168,76,0.12);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-family: 'Cinzel';
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .profile-body { padding: 1.5rem 2rem; }
+  .section-label {
+    font-family: 'Cinzel';
+    font-size: 0.7rem;
+    letter-spacing: 0.15rem;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .ancestor-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 1.8rem;
+  }
+  .ancestor-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid rgba(201,168,76,0.06);
+    cursor: pointer;
+    transition: background 0.15s;
+    padding-left: 0.5rem;
+    border-radius: 3px;
+  }
+  .ancestor-row:hover { background: rgba(201,168,76,0.05); }
+  .ancestor-row:last-child { border-bottom: none; }
+  .anc-gen {
+    font-family: 'Cinzel';
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    min-width: 24px;
+    text-align: center;
+  }
+  .anc-connector { color: var(--gold-dim); font-size: 0.85rem; }
+  .anc-name-ur { font-family: 'Noto Nastaliq Urdu'; font-size: 1.05rem; direction: rtl; flex: 1; }
+  .anc-name-en { font-size: 0.8rem; color: var(--text-secondary); font-style: italic; min-width: 120px; text-align: right; }
+
+  .people-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 1.8rem;
+  }
+  .person-chip {
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.6rem 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .person-chip:hover { border-color: var(--gold-dim); background: rgba(201,168,76,0.05); }
+  .person-chip.self { border-color: var(--gold); background: rgba(201,168,76,0.08); cursor: default; }
+  .chip-name-ur { font-family: 'Noto Nastaliq Urdu'; font-size: 1rem; direction: rtl; }
+  .chip-name-en { font-size: 0.75rem; color: var(--text-secondary); font-style: italic; }
+  .chip-label { font-size: 0.65rem; color: var(--text-muted); font-family: 'Cinzel'; letter-spacing: 0.05rem; }
+
+  .no-children {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+  }
+
+  /* ── BROWSE SECTION ── */
+  .browse-section {
+    max-width: 860px;
+    margin: 0 auto 4rem;
+    padding: 0 1.5rem;
+  }
+  .browse-title {
+    font-family: 'Cinzel';
+    font-size: 0.8rem;
+    letter-spacing: 0.2rem;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .gen-section { margin-bottom: 2.5rem; }
+  .gen-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .gen-num {
+    font-family: 'Cinzel';
+    font-size: 0.75rem;
+    color: var(--gold);
+    background: rgba(201,168,76,0.1);
+    border: 1px solid var(--gold-dim);
+    padding: 0.25rem 0.7rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .gen-line { flex: 1; height: 1px; background: var(--border); }
+  .gen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.5rem;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+  .footer-ur { font-family: 'Noto Nastaliq Urdu'; font-size: 1rem; direction: rtl; margin-bottom: 0.5rem; }
+
+  /* ── ORNAMENT ── */
+  .ornament { color: var(--gold-dim); margin: 0 0.5rem; }
+
+  @media (max-width: 600px) {
+    .profile-header { flex-direction: column; }
+    .people-grid { grid-template-columns: 1fr 1fr; }
+    .anc-name-en { display: none; }
+  }
+
+  /* ── VIEW SWITCHER ── */
+  .view-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.5rem 1rem 0;
+    flex-wrap: wrap;
+  }
+  .view-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    padding: 0.45rem 1.1rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .view-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .view-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+
+  /* ── INTERACTIVE TREE SECTION ── */
+  .tree-section {
+    max-width: 100%;
+    margin: 0 auto 4rem;
+    padding: 0 1rem;
+    display: none;
+  }
+  .tree-toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0 1.2rem;
+    flex-wrap: wrap;
+  }
+  .tree-toolbar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.15rem;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
+  .tree-branch-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.08rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tree-branch-btn:hover,
+  .tree-branch-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.1); }
+  .tree-zoom-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tree-zoom-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .tree-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  #treeCanvas {
+    width: 100%;
+    min-height: 520px;
+    background: var(--bg-mid);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: block;
+    cursor: grab;
+  }
+  #treeCanvas:active { cursor: grabbing; }
+  /* D3 tree node styles */
+  .tree-node circle {
+    fill: var(--bg-card2);
+    stroke: var(--gold-dim);
+    stroke-width: 1.5;
+    transition: fill 0.15s, stroke 0.15s;
+    cursor: pointer;
+  }
+  .tree-node circle:hover { fill: rgba(201,168,76,0.15); stroke: var(--gold); }
+  .tree-node.root circle { fill: rgba(201,168,76,0.18); stroke: var(--gold); stroke-width: 2; }
+  .tree-node.highlighted circle { fill: rgba(201,168,76,0.25); stroke: var(--gold-light); stroke-width: 2.5; }
+  .tree-node text {
+    font-family: 'EB Garamond', serif;
+    font-size: 11px;
+    fill: var(--text-secondary);
+    pointer-events: none;
+  }
+  .tree-node text.name-ur {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 12px;
+    fill: var(--text-primary);
+  }
+  .tree-link {
+    fill: none;
+    stroke: rgba(201,168,76,0.18);
+    stroke-width: 1.2;
+  }
+  .tree-tooltip {
+    position: fixed;
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    padding: 0.6rem 1rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+    max-width: 220px;
+  }
+  .tree-tooltip.visible { opacity: 1; }
+  .tt-name-ur { font-family: 'Noto Nastaliq Urdu'; font-size: 1.1rem; color: var(--gold-light); direction: rtl; }
+  .tt-name-en { font-family: 'EB Garamond'; font-style: italic; font-size: 0.85rem; color: var(--text-secondary); }
+  .tt-meta { font-family: 'Cinzel'; font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem; }
+  /* ── BRANCH NAVIGATOR ── */
+  .branch-nav {
+    max-width: 860px;
+    margin: 0 auto 2.5rem;
+    padding: 0 1.5rem;
+  }
+  .branch-nav-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2rem;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 1.2rem;
+  }
+  .branch-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 600px) { .branch-cards { grid-template-columns: 1fr; } }
+  .branch-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .branch-card:hover { border-color: var(--gold-dim); }
+  .branch-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(201,168,76,0.05) 0%, transparent 70%);
+    user-select: none;
+    gap: 0.8rem;
+  }
+  .branch-card-header:hover { background: rgba(201,168,76,0.08); }
+  .branch-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    color: var(--gold-dim);
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .branch-names { flex: 1; }
+  .branch-name-ur {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 1.05rem;
+    color: var(--gold-light);
+    direction: rtl;
+    line-height: 1.5;
+  }
+  .branch-name-en {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+  .branch-toggle {
+    color: var(--gold-dim);
+    font-size: 1rem;
+    flex-shrink: 0;
+    transition: transform 0.25s;
+  }
+  .branch-toggle.open { transform: rotate(180deg); }
+  .branch-body {
+    display: none;
+    padding: 0 1.2rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .branch-body.open { display: block; }
+  .branch-body-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    margin: 0.8rem 0 0.5rem;
+  }
+  .branch-member-list { display: flex; flex-direction: column; gap: 0.3rem; }
+  .branch-member {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .branch-member:hover { background: rgba(201,168,76,0.07); }
+  .branch-member-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 0.95rem; direction: rtl; flex: 1; }
+  .branch-member-en { font-size: 0.75rem; color: var(--text-secondary); font-style: italic; }
+  .branch-count { font-size: 0.65rem; font-family: 'Cinzel', serif; color: var(--text-muted); }
+</style>
+<body>
+
+<header class="header">
+  <div class="header-title-ur">شجرہ نسب — خاندان چنجوہ راجپوت</div>
+  <div class="header-title-en">Shajra Nasab — Chanjuha Rajput Lineage</div>
+  <div class="header-meta">
+    <span><span class="dot">✦</span> بانی: محمد صالح <span class="dot">✦</span></span>
+    <span>Patriarch: Muhammad Saleh</span>
+    <span><span class="dot">✦</span> تین بیٹے — Three Sons <span class="dot">✦</span></span>
+  </div>
+</header>
+
+<!-- View Switcher -->
+<div class="view-switcher">
+  <button class="view-btn active" id="btnBrowse" onclick="switchView('browse')">✦ Browse</button>
+  <button class="view-btn" id="btnTree" onclick="switchView('tree')">⋮ Family Tree</button>
+</div>
+
+<!-- Branch Navigator -->
+<div class="branch-nav" id="branchNav">
+  <div class="branch-nav-title">✦ Three Branches — تین شاخیں ✦</div>
+  <div class="branch-cards" id="branchCards"></div>
+</div>
+
+<div class="search-section">
+  <div class="search-wrap">
+    <input class="search-input" type="text" id="searchInput" placeholder="نام تلاش کریں — Search a name..." autocomplete="off">
+    <span class="search-icon">⌕</span>
+  </div>
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<div class="profile-section" id="profileSection"></div>
+
+<div class="browse-section" id="browseSection">
+  <div class="browse-title">✦ Browse by Generation ✦</div>
+  <div id="genContainer"></div>
+</div>
+
+<!-- Interactive Tree Section -->
+<div class="tree-section" id="treeSection">
+  <div class="tree-toolbar">
+    <span class="tree-toolbar-label">Branch:</span>
+    <button class="tree-branch-btn active" id="treeBtnAll" onclick="setTreeRoot('0')">All (Muhammad Saleh)</button>
+    <button class="tree-branch-btn" id="treeBtnB1" onclick="setTreeRoot('1')">1st Son — محمد بخش</button>
+    <button class="tree-branch-btn" id="treeBtnB2" onclick="setTreeRoot('2')">2nd Son — امام بخش</button>
+    <button class="tree-branch-btn" id="treeBtnB3" onclick="setTreeRoot('3')">3rd Son — ایزد بخش</button>
+    <span style="flex:1"></span>
+    <button class="tree-zoom-btn" onclick="treeZoom(1.25)" title="Zoom in">+</button>
+    <button class="tree-zoom-btn" onclick="treeZoom(0.8)" title="Zoom out">−</button>
+    <button class="tree-zoom-btn" onclick="treeResetZoom()" title="Reset" style="font-size:0.65rem;width:auto;padding:0 0.5rem;">Reset</button>
+  </div>
+  <p class="tree-hint">Click a node to view profile · Scroll or pinch to zoom · Drag to pan</p>
+  <svg id="treeCanvas"></svg>
+</div>
+<div class="tree-tooltip" id="treeTooltip">
+  <div class="tt-name-ur" id="ttNameUr"></div>
+  <div class="tt-name-en" id="ttNameEn"></div>
+  <div class="tt-meta" id="ttMeta"></div>
+</div>
+
+<footer class="footer">
+  <div class="footer-ur">محمد صالح (بانی) — تین بیٹے: محمد بخش، امام بخش، ایزد بخش — قوم راجپوت چنجوہ</div>
+  <div>Compiled from the Shajra Nasab chart · All three sons' lineages documented</div>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════
+// FAMILY DATA — All three sons' lineages of Muhammad Saleh
+// id: unique code matching the handwritten numbering
+// gen: generation number (Muhammad Saleh = 0)
+// ════════════════════════════════════════════════
+const people = [
+  // ── GENERATION 0 ──
+  { id: "0", nameUr: "محمد صالح", nameEn: "Muhammad Saleh", parent: null, gen: 0 },
+
+  // ── GENERATION 1 (sons of Muhammad Saleh) ──
+  { id: "1", nameUr: "محمد بخش", nameEn: "Muhammad Bakhsh", parent: "0", gen: 1, branch: 1 },
+  { id: "2", nameUr: "امام بخش", nameEn: "Imam Bakhsh", parent: "0", gen: 1, branch: 2 },
+  { id: "3", nameUr: "ایزد بخش", nameEn: "Aezad Bakhsh", parent: "0", gen: 1, branch: 3 },
+
+  // ── GENERATION 2 (sons of Muhammad Bakhsh — per Shajra 1st son PDF) ──
+  { id: "1.1", nameUr: "سلطان محمد", nameEn: "Sultan Muhammad", parent: "1", gen: 2 },
+  { id: "1.2", nameUr: "فیض بخش", nameEn: "Faiz Bakhsh", parent: "1", gen: 2 },
+  { id: "1.3", nameUr: "کریم بخش", nameEn: "Karim Bakhsh", parent: "1", gen: 2 },
+
+  // ── GENERATION 3 (sons of Sultan Muhammad) ──
+  { id: "1.1.1", nameUr: "فتح محمد", nameEn: "Fateh Muhammad", parent: "1.1", gen: 3 },
+  { id: "1.1.2", nameUr: "گل محمد", nameEn: "Gul Muhammad", parent: "1.1", gen: 3 },
+  { id: "1.1.3", nameUr: "حسن محمد", nameEn: "Hasan Muhammad", parent: "1.1", gen: 3 },
+  { id: "1.1.4", nameUr: "شاہ محمد", nameEn: "Shah Muhammad", parent: "1.1", gen: 3 },
+
+  // ── Branch I.1: Fateh Muhammad ──
+  { id: "1.1.1.1", nameUr: "شہاب الدین", nameEn: "Shahab ud Din", parent: "1.1.1", gen: 4 },
+  { id: "1.1.1.2", nameUr: "چراغ الدین", nameEn: "Chiragh ud Din", parent: "1.1.1", gen: 4 },
+  { id: "1.1.1.3", nameUr: "سراج الدین", nameEn: "Siraj ud Din", parent: "1.1.1", gen: 4 },
+
+  // Shahab ud Din
+  { id: "1.1.1.1.1", nameUr: "محمد صدیق", nameEn: "Muhammad Siddique", parent: "1.1.1.1", gen: 5 },
+  { id: "1.1.1.1.2", nameUr: "محمد سعید", nameEn: "Muhammad Saeed", parent: "1.1.1.1", gen: 5 },
+  { id: "1.1.1.1.3", nameUr: "نصیر الدین", nameEn: "Nasir ud Din", parent: "1.1.1.1", gen: 5 },
+  { id: "1.1.1.1.4", nameUr: "محمد شفیع", nameEn: "Muhammad Shafi", parent: "1.1.1.1", gen: 5 },
+
+  { id: "1.1.1.1.3.1", nameUr: "مقبول احمد", nameEn: "Maqbool Ahmed", parent: "1.1.1.1.3", gen: 6 },
+  { id: "1.1.1.1.3.2", nameUr: "مسعود احمد", nameEn: "Masood Ahmed", parent: "1.1.1.1.3", gen: 6 },
+  { id: "1.1.1.1.3.3", nameUr: "محمود احمد", nameEn: "Mahmood Ahmed", parent: "1.1.1.1.3", gen: 6 },
+  { id: "1.1.1.1.3.4", nameUr: "نذیر احمد", nameEn: "Nazeer Ahmed", parent: "1.1.1.1.3", gen: 6 },
+  { id: "1.1.1.1.3.5", nameUr: "بشیر احمد", nameEn: "Bashir Ahmed", parent: "1.1.1.1.3", gen: 6 },
+
+  { id: "1.1.1.1.3.1.1", nameUr: "طاہر مقبول", nameEn: "Tahir Maqbool", parent: "1.1.1.1.3.1", gen: 7 },
+  { id: "1.1.1.1.3.1.2", nameUr: "زاہد مقبول", nameEn: "Zahid Maqbool", parent: "1.1.1.1.3.1", gen: 7 },
+  { id: "1.1.1.1.3.1.3", nameUr: "ظہیر الدین بابر", nameEn: "Zaheer ud Din Babar", parent: "1.1.1.1.3.1", gen: 7 },
+  { id: "1.1.1.1.3.1.4", nameUr: "شہزاد خرم", nameEn: "Shahzad Khurram", parent: "1.1.1.1.3.1", gen: 7 },
+
+  { id: "1.1.1.1.3.2.1", nameUr: "طارق مسعود", nameEn: "Tariq Masood", parent: "1.1.1.1.3.2", gen: 7 },
+
+  { id: "1.1.1.1.3.4.1", nameUr: "خالد نذیر", nameEn: "Khalid Nazeer", parent: "1.1.1.1.3.4", gen: 7 },
+  { id: "1.1.1.1.3.4.2", nameUr: "زاہد نذیر", nameEn: "Zahid Nazeer", parent: "1.1.1.1.3.4", gen: 7 },
+  { id: "1.1.1.1.3.4.3", nameUr: "شفیق احمد", nameEn: "Shafique Ahmed", parent: "1.1.1.1.3.4", gen: 7 },
+  { id: "1.1.1.1.3.4.4", nameUr: "عرفان احمد", nameEn: "Irfan Ahmed", parent: "1.1.1.1.3.4", gen: 7 },
+
+  { id: "1.1.1.1.3.5.1", nameUr: "محمد سلیم", nameEn: "Muhammad Saleem", parent: "1.1.1.1.3.5", gen: 7 },
+
+  { id: "1.1.1.1.4.1", nameUr: "ریاض احمد", nameEn: "Riaz Ahmed", parent: "1.1.1.1.4", gen: 6 },
+  { id: "1.1.1.1.4.1.1", nameUr: "خرم شہزاد", nameEn: "Khurram Shahzad", parent: "1.1.1.1.4.1", gen: 7 },
+  { id: "1.1.1.1.4.1.2", nameUr: "بابر شہزاد", nameEn: "Babar Shahzad", parent: "1.1.1.1.4.1", gen: 7 },
+
+  // Chiragh ud Din
+  { id: "1.1.1.2.1", nameUr: "دوست علی", nameEn: "Dost Ali", parent: "1.1.1.2", gen: 5 },
+  { id: "1.1.1.2.2", nameUr: "فیروز دین", nameEn: "Feroz Din", parent: "1.1.1.2", gen: 5 },
+  { id: "1.1.1.2.3", nameUr: "عبد الغنی", nameEn: "Abdul Ghani", parent: "1.1.1.2", gen: 5 },
+  { id: "1.1.1.2.4", nameUr: "انور علی خان", nameEn: "Anwar Ali Khan", parent: "1.1.1.2", gen: 5 },
+
+  { id: "1.1.1.2.1.1", nameUr: "مشتاق احمد", nameEn: "Mushtaq Ahmed", parent: "1.1.1.2.1", gen: 6 },
+  { id: "1.1.1.2.1.2", nameUr: "نذیر احمد", nameEn: "Nazeer Ahmed", parent: "1.1.1.2.1", gen: 6 },
+  { id: "1.1.1.2.1.3", nameUr: "بشیر احمد", nameEn: "Bashir Ahmed", parent: "1.1.1.2.1", gen: 6 },
+
+  { id: "1.1.1.2.1.2.1", nameUr: "سمیع اللہ", nameEn: "Samiullah", parent: "1.1.1.2.1.2", gen: 7 },
+  { id: "1.1.1.2.1.2.2", nameUr: "مطیع اللہ", nameEn: "Matiullah", parent: "1.1.1.2.1.2", gen: 7 },
+
+  { id: "1.1.1.2.1.2.1.1", nameUr: "سلمان سمیع", nameEn: "Salman Sami", parent: "1.1.1.2.1.2.1", gen: 8 },
+  { id: "1.1.1.2.1.2.1.2", nameUr: "عثمان سمیع", nameEn: "Usman Sami", parent: "1.1.1.2.1.2.1", gen: 8 },
+
+  { id: "1.1.1.2.1.2.2.1", nameUr: "امیر مطیع", nameEn: "Ameer Mati", parent: "1.1.1.2.1.2.2", gen: 8 },
+  { id: "1.1.1.2.1.2.2.2", nameUr: "امین مطیع", nameEn: "Ameen Mati", parent: "1.1.1.2.1.2.2", gen: 8 },
+  { id: "1.1.1.2.1.2.2.3", nameUr: "احمد مطیع", nameEn: "Ahmed Mati", parent: "1.1.1.2.1.2.2", gen: 8 },
+
+  { id: "1.1.1.2.4.1", nameUr: "محمد افضل خان", nameEn: "Muhammad Afzal Khan", parent: "1.1.1.2.4", gen: 6 },
+  { id: "1.1.1.2.4.2", nameUr: "محمد اسلم خان", nameEn: "Muhammad Aslam Khan", parent: "1.1.1.2.4", gen: 6 },
+
+  // Siraj ud Din
+  { id: "1.1.1.3.1", nameUr: "برکت علی", nameEn: "Barkat Ali", parent: "1.1.1.3", gen: 5 },
+  { id: "1.1.1.3.2", nameUr: "غلام مصطفی", nameEn: "Ghulam Mustafa", parent: "1.1.1.3", gen: 5 },
+  { id: "1.1.1.3.3", nameUr: "فضل حسین", nameEn: "Fazal Hussain", parent: "1.1.1.3", gen: 5 },
+  { id: "1.1.1.3.4", nameUr: "نذیر احمد خان", nameEn: "Nazeer Ahmed Khan", parent: "1.1.1.3", gen: 5 },
+
+  { id: "1.1.1.3.2.1", nameUr: "فیروز خان", nameEn: "Feroz Khan", parent: "1.1.1.3.2", gen: 6 },
+
+  { id: "1.1.1.3.2.1.1", nameUr: "فضل الحق", nameEn: "Fazal ul Haq", parent: "1.1.1.3.2.1", gen: 7 },
+  { id: "1.1.1.3.2.1.2", nameUr: "ذکاء الحق", nameEn: "Zaka ul Haq", parent: "1.1.1.3.2.1", gen: 7 },
+  { id: "1.1.1.3.2.1.3", nameUr: "اعجاز الحق", nameEn: "Ijaz ul Haq", parent: "1.1.1.3.2.1", gen: 7 },
+  { id: "1.1.1.3.2.1.4", nameUr: "ضیاء الحق", nameEn: "Zia ul Haq", parent: "1.1.1.3.2.1", gen: 7 },
+
+  { id: "1.1.1.3.2.1.1.1", nameUr: "شہزاد الحق", nameEn: "Shahzad ul Haq", parent: "1.1.1.3.2.1.1", gen: 8 },
+
+  { id: "1.1.1.3.2.1.2.1", nameUr: "سلمان الحق", nameEn: "Salman ul Haq", parent: "1.1.1.3.2.1.2", gen: 8 },
+  { id: "1.1.1.3.2.1.2.2", nameUr: "نعمان الحق", nameEn: "Numan ul Haq", parent: "1.1.1.3.2.1.2", gen: 8 },
+
+  { id: "1.1.1.3.2.1.3.1", nameUr: "احتشام الحق", nameEn: "Ehtisham ul Haq", parent: "1.1.1.3.2.1.3", gen: 8 },
+
+  { id: "1.1.1.3.2.1.4.1", nameUr: "احسان الحق", nameEn: "Ehsan ul Haq", parent: "1.1.1.3.2.1.4", gen: 8 },
+  { id: "1.1.1.3.2.1.4.2", nameUr: "انضمام الحق", nameEn: "Inzamam ul Haq", parent: "1.1.1.3.2.1.4", gen: 8 },
+  { id: "1.1.1.3.2.1.4.3", nameUr: "مظہر الحق", nameEn: "Mazhar ul Haq", parent: "1.1.1.3.2.1.4", gen: 8 },
+
+  { id: "1.1.1.3.4.1", nameUr: "محمد افضل", nameEn: "Muhammad Afzal", parent: "1.1.1.3.4", gen: 6 },
+  { id: "1.1.1.3.4.2", nameUr: "عبد الرحمن", nameEn: "Abdul Rehman", parent: "1.1.1.3.4", gen: 6 },
+  { id: "1.1.1.3.4.3", nameUr: "فضل الٰہی", nameEn: "Fazal e Ilahi", parent: "1.1.1.3.4", gen: 6 },
+
+  { id: "1.1.1.3.4.1.1", nameUr: "واثق رحمن", nameEn: "Wasiq Rehman", parent: "1.1.1.3.4.1", gen: 7 },
+  { id: "1.1.1.3.4.1.2", nameUr: "عتیق الرحمن", nameEn: "Atiq ur Rehman", parent: "1.1.1.3.4.1", gen: 7 },
+  { id: "1.1.1.3.4.1.3", nameUr: "شفیق الرحمن", nameEn: "Shafique ur Rehman", parent: "1.1.1.3.4.1", gen: 7 },
+
+  { id: "1.1.1.3.4.2.1", nameUr: "عتیق الرحمن", nameEn: "Atiq ur Rehman", parent: "1.1.1.3.4.2", gen: 7 },
+  { id: "1.1.1.3.4.2.2", nameUr: "عزیز الرحمن", nameEn: "Aziz ur Rehman", parent: "1.1.1.3.4.2", gen: 7 },
+
+  // ── Branch I.2: Gul Muhammad ──
+  { id: "1.1.2.1", nameUr: "رحیم بخش", nameEn: "Rahim Bakhsh", parent: "1.1.2", gen: 4 },
+
+  { id: "1.1.2.1.1", nameUr: "محمد رمضان", nameEn: "Muhammad Ramadan", parent: "1.1.2.1", gen: 5 },
+  { id: "1.1.2.1.1.1", nameUr: "حیات علی", nameEn: "Hayat Ali", parent: "1.1.2.1.1", gen: 6 },
+
+  { id: "1.1.2.1.1.1.1", nameUr: "محمد نواز", nameEn: "Muhammad Nawaz", parent: "1.1.2.1.1.1", gen: 7 },
+  { id: "1.1.2.1.1.1.2", nameUr: "عطا اللہ", nameEn: "Attaullah", parent: "1.1.2.1.1.1", gen: 7 },
+  { id: "1.1.2.1.1.1.3", nameUr: "ضیاء اللہ", nameEn: "Ziaullah", parent: "1.1.2.1.1.1", gen: 7 },
+  { id: "1.1.2.1.1.1.4", nameUr: "محمد اشرف", nameEn: "Muhammad Ashraf", parent: "1.1.2.1.1.1", gen: 7 },
+  { id: "1.1.2.1.1.1.5", nameUr: "محمد ظفر اقبال", nameEn: "Muhammad Zafar Iqbal", parent: "1.1.2.1.1.1", gen: 7 },
+  { id: "1.1.2.1.1.1.6", nameUr: "محمد اکرم", nameEn: "Muhammad Akram", parent: "1.1.2.1.1.1", gen: 7 },
+
+  { id: "1.1.2.1.1.1.2.1", nameUr: "سلمان محمود", nameEn: "Salman Mehmood", parent: "1.1.2.1.1.1.2", gen: 8 },
+  { id: "1.1.2.1.1.1.2.2", nameUr: "مسعود الرحمن", nameEn: "Masood ur Rehman", parent: "1.1.2.1.1.1.2", gen: 8 },
+  { id: "1.1.2.1.1.1.2.3", nameUr: "ظاہر فاروق", nameEn: "Zahir Farooq", parent: "1.1.2.1.1.1.2", gen: 8 },
+  { id: "1.1.2.1.1.1.2.4", nameUr: "طارق محمود", nameEn: "Tariq Mehmood", parent: "1.1.2.1.1.1.2", gen: 8 },
+
+  { id: "1.1.2.1.1.1.2.1.1", nameUr: "ذیشان محمود", nameEn: "Zeeshan Mehmood", parent: "1.1.2.1.1.1.2.1", gen: 9 },
+  { id: "1.1.2.1.1.1.2.1.2", nameUr: "نعمان محمود", nameEn: "Numan Mehmood", parent: "1.1.2.1.1.1.2.1", gen: 9 },
+
+  { id: "1.1.2.1.1.1.2.3.1", nameUr: "محمد طلحہ", nameEn: "Muhammad Talha", parent: "1.1.2.1.1.1.2.3", gen: 9 },
+  { id: "1.1.2.1.1.1.2.4.1", nameUr: "محمد عتب", nameEn: "Muhammad Utab", parent: "1.1.2.1.1.1.2.4", gen: 9 },
+
+  { id: "1.1.2.1.1.1.3.1", nameUr: "عبد الحفیظ احمد", nameEn: "Abdul Hafeez Ahmed", parent: "1.1.2.1.1.1.3", gen: 8 },
+  { id: "1.1.2.1.1.1.3.2", nameUr: "محمد ندیم ضیاء", nameEn: "Muhammad Nadeem Zia", parent: "1.1.2.1.1.1.3", gen: 8 },
+
+  { id: "1.1.2.1.1.1.4.1", nameUr: "بابر جہانگیر", nameEn: "Babar Jehangir", parent: "1.1.2.1.1.1.4", gen: 8 },
+  { id: "1.1.2.1.1.1.4.2", nameUr: "بدر جہانگیر", nameEn: "Badr Jahangir", parent: "1.1.2.1.1.1.4", gen: 8 },
+
+  { id: "1.1.2.1.1.1.5.1", nameUr: "محمد عماد", nameEn: "Muhammad Immad", parent: "1.1.2.1.1.1.5", gen: 8 },
+  { id: "1.1.2.1.1.1.5.2", nameUr: "محمد فواد", nameEn: "Muhammad Fawad", parent: "1.1.2.1.1.1.5", gen: 8 },
+  { id: "1.1.2.1.1.1.5.3", nameUr: "محمد شہزاد", nameEn: "Muhammad Shahzad", parent: "1.1.2.1.1.1.5", gen: 8 },
+
+  { id: "1.1.2.1.1.1.6.1", nameUr: "محمد عابد", nameEn: "Muhammad Abid", parent: "1.1.2.1.1.1.6", gen: 8 },
+  { id: "1.1.2.1.1.1.6.2", nameUr: "محمد آصف", nameEn: "Muhammad Asif", parent: "1.1.2.1.1.1.6", gen: 8 },
+
+  // ── Branch I.3: Hasan Muhammad ──
+  { id: "1.1.3.1", nameUr: "اکبر علی", nameEn: "Akber Ali", parent: "1.1.3", gen: 4 },
+  { id: "1.1.3.2", nameUr: "دوست علی", nameEn: "Dost Ali", parent: "1.1.3", gen: 4 },
+
+  { id: "1.1.3.1.1", nameUr: "کرم الٰہی", nameEn: "Karam Ilaahi", parent: "1.1.3.1", gen: 5 },
+
+  { id: "1.1.3.1.1.1", nameUr: "عنایت اللہ خان", nameEn: "Inayatullah Khan", parent: "1.1.3.1.1", gen: 6 },
+  { id: "1.1.3.1.1.2", nameUr: "مراد علی", nameEn: "Murad Ali", parent: "1.1.3.1.1", gen: 6 },
+
+  { id: "1.1.3.1.1.2.1", nameUr: "بشیر احمد", nameEn: "Bashir Ahmed", parent: "1.1.3.1.1.2", gen: 7 },
+  { id: "1.1.3.1.1.2.2", nameUr: "رشید احمد", nameEn: "Rashid Ahmed", parent: "1.1.3.1.1.2", gen: 7 },
+
+  { id: "1.1.3.1.1.2.1.1", nameUr: "تیمور", nameEn: "Taimoor", parent: "1.1.3.1.1.2.1", gen: 8 },
+
+  { id: "1.1.3.1.1.2.2.1", nameUr: "محمد جاوید", nameEn: "Muhammad Javeed", parent: "1.1.3.1.1.2.2", gen: 8 },
+  { id: "1.1.3.1.1.2.2.2", nameUr: "محبوب عالم", nameEn: "Mehboob Alam", parent: "1.1.3.1.1.2.2", gen: 8 },
+  { id: "1.1.3.1.1.2.2.3", nameUr: "محمد اسلم", nameEn: "Muhammad Aslam", parent: "1.1.3.1.1.2.2", gen: 8 },
+  { id: "1.1.3.1.1.2.2.4", nameUr: "محمد افضل", nameEn: "Muhammad Afzal", parent: "1.1.3.1.1.2.2", gen: 8 },
+
+  { id: "1.1.3.1.1.2.2.1.1", nameUr: "عظیم جاوید", nameEn: "Azeem Javeed", parent: "1.1.3.1.1.2.2.1", gen: 9 },
+  { id: "1.1.3.1.1.2.2.1.2", nameUr: "چاند جاوید", nameEn: "Chand Javeed", parent: "1.1.3.1.1.2.2.1", gen: 9 },
+  { id: "1.1.3.1.1.2.2.1.3", nameUr: "وسیم جاوید", nameEn: "Waseem Javeed", parent: "1.1.3.1.1.2.2.1", gen: 9 },
+  { id: "1.1.3.1.1.2.2.1.4", nameUr: "نعیم جاوید", nameEn: "Naeem Javeed", parent: "1.1.3.1.1.2.2.1", gen: 9 },
+
+  { id: "1.1.3.1.1.2.2.4.1", nameUr: "ندیم افضل", nameEn: "Nadeem Afzal", parent: "1.1.3.1.1.2.2.4", gen: 9 },
+  { id: "1.1.3.1.1.2.2.4.2", nameUr: "نوید افضل", nameEn: "Naveed Afzal", parent: "1.1.3.1.1.2.2.4", gen: 9 },
+  { id: "1.1.3.1.1.2.2.4.3", nameUr: "وحید افضل", nameEn: "Waheed Afzal", parent: "1.1.3.1.1.2.2.4", gen: 9 },
+
+  { id: "1.1.3.2.1", nameUr: "محمد ہاشم", nameEn: "Muhammad Hashim", parent: "1.1.3.2", gen: 5 },
+  { id: "1.1.3.2.2", nameUr: "محبوب", nameEn: "Mehboob", parent: "1.1.3.2", gen: 5 },
+  { id: "1.1.3.2.3", nameUr: "محمد بخش", nameEn: "Muhammad Bakhsh", parent: "1.1.3.2", gen: 5 },
+
+  { id: "1.1.3.2.1.1", nameUr: "محمد شریف", nameEn: "Muhammad Sharif", parent: "1.1.3.2.1", gen: 6 },
+
+  { id: "1.1.3.2.1.1.1", nameUr: "عبد الرحمن", nameEn: "Abdul Rehman", parent: "1.1.3.2.1.1", gen: 7 },
+  { id: "1.1.3.2.1.1.2", nameUr: "عبد القیوم", nameEn: "Abdul Qayyum", parent: "1.1.3.2.1.1", gen: 7 },
+  { id: "1.1.3.2.1.1.3", nameUr: "عبد الرشید", nameEn: "Abdul Rashid", parent: "1.1.3.2.1.1", gen: 7 },
+
+  { id: "1.1.3.2.1.1.1.1", nameUr: "نعیم شہزاد", nameEn: "Naeem Shahzad", parent: "1.1.3.2.1.1.1", gen: 8 },
+  { id: "1.1.3.2.1.1.1.2", nameUr: "عبد الرحیم", nameEn: "Abdul Rahim", parent: "1.1.3.2.1.1.1", gen: 8 },
+  { id: "1.1.3.2.1.1.1.3", nameUr: "عبد القدوس", nameEn: "Abdul Qaddus", parent: "1.1.3.2.1.1.1", gen: 8 },
+  { id: "1.1.3.2.1.1.1.4", nameUr: "عبد الرؤف", nameEn: "Abdul Rauf", parent: "1.1.3.2.1.1.1", gen: 8 },
+
+  { id: "1.1.3.2.1.1.1.2.1", nameUr: "اویس گلستان", nameEn: "Awais Gulistan", parent: "1.1.3.2.1.1.1.2", gen: 9 },
+  { id: "1.1.3.2.1.1.1.3.1", nameUr: "محمد سلمان حمزہ", nameEn: "Muhammad Salman Hamza", parent: "1.1.3.2.1.1.1.3", gen: 9 },
+  { id: "1.1.3.2.1.1.1.4.1", nameUr: "سمیط رؤف", nameEn: "Sameet Rauf", parent: "1.1.3.2.1.1.1.4", gen: 9 },
+
+  { id: "1.1.3.2.1.1.2.1", nameUr: "محمد ندیم", nameEn: "Muhammad Nadeem", parent: "1.1.3.2.1.1.2", gen: 8 },
+  { id: "1.1.3.2.1.1.2.2", nameUr: "محمد نعیم", nameEn: "Muhammad Naeem", parent: "1.1.3.2.1.1.2", gen: 8 },
+  { id: "1.1.3.2.1.1.2.3", nameUr: "عبد الحفیظ", nameEn: "Abdul Hafeez", parent: "1.1.3.2.1.1.2", gen: 8 },
+
+  { id: "1.1.3.2.1.1.2.2.1", nameUr: "ہمام رافع", nameEn: "Hamaam Rafeh", parent: "1.1.3.2.1.1.2.2", gen: 9 },
+  { id: "1.1.3.2.1.1.2.3.1", nameUr: "ثاقب حفیظ", nameEn: "Saqib Hafeez", parent: "1.1.3.2.1.1.2.3", gen: 9 },
+  { id: "1.1.3.2.1.1.2.3.2", nameUr: "دانش حفیظ", nameEn: "Danish Hafeez", parent: "1.1.3.2.1.1.2.3", gen: 9 },
+
+  { id: "1.1.3.2.1.1.3.1", nameUr: "ہارون", nameEn: "Haroon", parent: "1.1.3.2.1.1.3", gen: 8 },
+  { id: "1.1.3.2.1.1.3.2", nameUr: "کاشف", nameEn: "Kashif", parent: "1.1.3.2.1.1.3", gen: 8 },
+  { id: "1.1.3.2.1.1.3.3", nameUr: "آصف", nameEn: "Asif", parent: "1.1.3.2.1.1.3", gen: 8 },
+  { id: "1.1.3.2.1.1.3.4", nameUr: "قاسم", nameEn: "Qasim", parent: "1.1.3.2.1.1.3", gen: 8 },
+  { id: "1.1.3.2.1.1.3.5", nameUr: "عاصم", nameEn: "Aasim", parent: "1.1.3.2.1.1.3", gen: 8 },
+  { id: "1.1.3.2.1.1.3.6", nameUr: "نوید", nameEn: "Naveed", parent: "1.1.3.2.1.1.3", gen: 8 },
+
+  // ── Branch I.4: Shah Muhammad ──
+  { id: "1.1.4.1", nameUr: "نظام الدین", nameEn: "Nizam ud Din", parent: "1.1.4", gen: 4 },
+
+  { id: "1.1.4.1.1", nameUr: "محمد دین", nameEn: "Muhammad Din", parent: "1.1.4.1", gen: 5 },
+  { id: "1.1.4.1.2", nameUr: "احمد دین", nameEn: "Ahmed Din", parent: "1.1.4.1", gen: 5 },
+  { id: "1.1.4.1.3", nameUr: "حسن دین", nameEn: "Hassan Din", parent: "1.1.4.1", gen: 5 },
+
+  { id: "1.1.4.1.2.1", nameUr: "محمد شریف", nameEn: "Muhammad Sharif", parent: "1.1.4.1.2", gen: 6 },
+
+  { id: "1.1.4.1.2.1.1", nameUr: "جاوید اقبال", nameEn: "Javeed Iqbal", parent: "1.1.4.1.2.1", gen: 7 },
+  { id: "1.1.4.1.2.1.2", nameUr: "محمد نعیم", nameEn: "Muhammad Naeem", parent: "1.1.4.1.2.1", gen: 7 },
+  { id: "1.1.4.1.2.1.3", nameUr: "محمد سلیم", nameEn: "Muhammad Saleem", parent: "1.1.4.1.2.1", gen: 7 },
+  { id: "1.1.4.1.2.1.4", nameUr: "عبد الغفور", nameEn: "Abdul Ghafoor", parent: "1.1.4.1.2.1", gen: 7 },
+
+  { id: "1.1.4.1.2.1.2.1", nameUr: "عمر نعیم", nameEn: "Umar Naeem", parent: "1.1.4.1.2.1.2", gen: 8 },
+  { id: "1.1.4.1.2.1.3.1", nameUr: "عمر سلیم", nameEn: "Umar Saleem", parent: "1.1.4.1.2.1.3", gen: 8 },
+  { id: "1.1.4.1.2.1.3.2", nameUr: "زبیر سلیم", nameEn: "Zubair Saleem", parent: "1.1.4.1.2.1.3", gen: 8 },
+
+  { id: "1.1.4.1.2.1.4.1", nameUr: "محمد مصباح", nameEn: "Muhammad Misbah", parent: "1.1.4.1.2.1.4", gen: 8 },
+  { id: "1.1.4.1.2.1.4.2", nameUr: "محمد سجاد", nameEn: "Muhammad Sajjad", parent: "1.1.4.1.2.1.4", gen: 8 },
+  { id: "1.1.4.1.2.1.4.3", nameUr: "محمد وقاص", nameEn: "Muhammad Waqas", parent: "1.1.4.1.2.1.4", gen: 8 },
+  { id: "1.1.4.1.2.1.4.4", nameUr: "محمد سرفراز", nameEn: "Muhammad Sarfraz", parent: "1.1.4.1.2.1.4", gen: 8 },
+
+  // ── Branch II: Faiz Bakhsh ──
+  { id: "1.2.1", nameUr: "مہتاب دین", nameEn: "Mahtab Din", parent: "1.2", gen: 3 },
+  { id: "1.2.2", nameUr: "بدر دین", nameEn: "Badr Din", parent: "1.2", gen: 3 },
+  { id: "1.2.3", nameUr: "قائم الدین", nameEn: "Qaim ud Din", parent: "1.2", gen: 3 },
+
+  { id: "1.2.2.1", nameUr: "علی اکبر", nameEn: "Ali Akbar", parent: "1.2.2", gen: 4 },
+  { id: "1.2.2.1.1", nameUr: "غلام نبی", nameEn: "Ghulam Nabi", parent: "1.2.2.1", gen: 5 },
+  { id: "1.2.2.1.1.1", nameUr: "بدر دین", nameEn: "Badr Din", parent: "1.2.2.1.1", gen: 6 },
+  { id: "1.2.2.1.1.2", nameUr: "حسن دین", nameEn: "Hassan Din", parent: "1.2.2.1.1", gen: 6 },
+  { id: "1.2.2.1.1.1.1", nameUr: "ناظر حسین", nameEn: "Nazir Hussain", parent: "1.2.2.1.1.1", gen: 7 },
+  { id: "1.2.2.1.1.1.1.1", nameUr: "امان اللہ", nameEn: "Amanullah", parent: "1.2.2.1.1.1.1", gen: 8 },
+  { id: "1.2.2.1.1.1.1.1.1", nameUr: "محمد زبیر", nameEn: "Muhammad Zubair", parent: "1.2.2.1.1.1.1.1", gen: 9 },
+  { id: "1.2.2.1.1.1.1.1.2", nameUr: "محمد عمیر", nameEn: "Muhammad Umair", parent: "1.2.2.1.1.1.1.1", gen: 9 },
+
+  { id: "1.2.3.1", nameUr: "نور احمد", nameEn: "Noor Ahmad", parent: "1.2.3", gen: 4 },
+  { id: "1.2.3.2", nameUr: "شیخ احمد", nameEn: "Sheikh Ahmad", parent: "1.2.3", gen: 4 },
+
+  { id: "1.2.3.1.1", nameUr: "ابراہیم", nameEn: "Ibrahim", parent: "1.2.3.1", gen: 5 },
+  { id: "1.2.3.1.2", nameUr: "محمد علی", nameEn: "Muhammad Ali", parent: "1.2.3.1", gen: 5 },
+  { id: "1.2.3.1.1.1", nameUr: "اسماعیل", nameEn: "Ismail", parent: "1.2.3.1.1", gen: 6 },
+  { id: "1.2.3.1.2.1", nameUr: "فیروز الدین", nameEn: "Feroz ud Din", parent: "1.2.3.1.2", gen: 6 },
+
+  { id: "1.2.3.1.2.1.1", nameUr: "عبد العزیز", nameEn: "Abdul Aziz", parent: "1.2.3.1.2.1", gen: 7 },
+  { id: "1.2.3.1.2.1.2", nameUr: "محمد حنیف", nameEn: "Muhammad Hanif", parent: "1.2.3.1.2.1", gen: 7 },
+  { id: "1.2.3.1.2.1.3", nameUr: "عبد الحمید", nameEn: "Abdul Hamid", parent: "1.2.3.1.2.1", gen: 7 },
+  { id: "1.2.3.1.2.1.4", nameUr: "عبد المجید", nameEn: "Abdul Majeed", parent: "1.2.3.1.2.1", gen: 7 },
+  { id: "1.2.3.1.2.1.5", nameUr: "عبد الرشید", nameEn: "Abdur Rashid", parent: "1.2.3.1.2.1", gen: 7 },
+
+  { id: "1.2.3.1.2.1.1.1", nameUr: "مراد عزیز", nameEn: "Murad Aziz", parent: "1.2.3.1.2.1.1", gen: 8 },
+  { id: "1.2.3.1.2.1.1.2", nameUr: "خرم عزیز", nameEn: "Khurram Aziz", parent: "1.2.3.1.2.1.1", gen: 8 },
+  { id: "1.2.3.1.2.1.1.3", nameUr: "سرفراز عزیز", nameEn: "Sarfraz Aziz", parent: "1.2.3.1.2.1.1", gen: 8 },
+
+  { id: "1.2.3.1.2.1.5.1", nameUr: "ارسلان رشید", nameEn: "Arsalan Rashid", parent: "1.2.3.1.2.1.5", gen: 8 },
+
+  { id: "1.2.3.1.2.1.4.1", nameUr: "افضل محمود", nameEn: "Afzal Mehmood", parent: "1.2.3.1.2.1.4", gen: 8 },
+  { id: "1.2.3.1.2.1.4.2", nameUr: "فیض رسول", nameEn: "Faiz Rasool", parent: "1.2.3.1.2.1.4", gen: 8 },
+  { id: "1.2.3.1.2.1.4.3", nameUr: "نعیم محمود", nameEn: "Naeem Mehmood", parent: "1.2.3.1.2.1.4", gen: 8 },
+  { id: "1.2.3.1.2.1.4.4", nameUr: "ارشد محمود", nameEn: "Arshad Mehmood", parent: "1.2.3.1.2.1.4", gen: 8 },
+
+  { id: "1.2.3.1.2.1.3.1", nameUr: "محمد سلیم", nameEn: "Muhammad Saleem", parent: "1.2.3.1.2.1.3", gen: 8 },
+  { id: "1.2.3.1.2.1.3.1.1", nameUr: "آصف سلیم", nameEn: "Asif Saleem", parent: "1.2.3.1.2.1.3.1", gen: 9 },
+  { id: "1.2.3.1.2.1.3.1.2", nameUr: "کاشف سلیم", nameEn: "Kashif Saleem", parent: "1.2.3.1.2.1.3.1", gen: 9 },
+
+  { id: "1.2.3.2.1", nameUr: "رکن دین", nameEn: "Rukn Din", parent: "1.2.3.2", gen: 5 },
+  { id: "1.2.3.2.2", nameUr: "لال دین", nameEn: "Lal Din", parent: "1.2.3.2", gen: 5 },
+  { id: "1.2.3.2.3", nameUr: "محبوب دین", nameEn: "Mehboob Din", parent: "1.2.3.2", gen: 5 },
+
+  { id: "1.2.3.2.2.1", nameUr: "محمد صدیق", nameEn: "Muhammad Siddique", parent: "1.2.3.2.2", gen: 6 },
+  { id: "1.2.3.2.2.2", nameUr: "محمد شفیع", nameEn: "Muhammad Shafi", parent: "1.2.3.2.2", gen: 6 },
+  { id: "1.2.3.2.2.2.1", nameUr: "طارق محمود", nameEn: "Tariq Mehmood", parent: "1.2.3.2.2.2", gen: 7 },
+
+  // ── Branch III: Karim Bakhsh ──
+  { id: "1.3.1", nameUr: "بدر دین", nameEn: "Badr Din", parent: "1.3", gen: 3 },
+  { id: "1.3.2", nameUr: "صدر دین", nameEn: "Sadr Din", parent: "1.3", gen: 3 },
+  { id: "1.3.3", nameUr: "عطر دین", nameEn: "Atar Din", parent: "1.3", gen: 3 },
+
+  { id: "1.3.1.1", nameUr: "نور حسین", nameEn: "Nur Hussain", parent: "1.3.1", gen: 4 },
+  { id: "1.3.1.1.1", nameUr: "تاج دین", nameEn: "Taj Din", parent: "1.3.1.1", gen: 5 },
+
+  { id: "1.3.3.1", nameUr: "اللہ دتا", nameEn: "Allah Datta", parent: "1.3.3", gen: 4 },
+  { id: "1.3.3.2", nameUr: "عالم دین", nameEn: "Alim Din", parent: "1.3.3", gen: 4 },
+
+  { id: "1.3.3.1.1", nameUr: "محمد علی", nameEn: "Muhammad Ali", parent: "1.3.3.1", gen: 5 },
+  { id: "1.3.3.1.2", nameUr: "کرم علی", nameEn: "Karam Ali", parent: "1.3.3.1", gen: 5 },
+  { id: "1.3.3.1.3", nameUr: "محمد شریف", nameEn: "Muhammad Sharif", parent: "1.3.3.1", gen: 5 },
+
+  { id: "1.3.3.1.1.1", nameUr: "ہدایت اللہ", nameEn: "Hidayatullah", parent: "1.3.3.1.1", gen: 6 },
+  { id: "1.3.3.1.1.2", nameUr: "عنایت اللہ", nameEn: "Inayatullah", parent: "1.3.3.1.1", gen: 6 },
+
+  { id: "1.3.3.1.1.1.1", nameUr: "محمد افضل", nameEn: "Muhammad Afzal", parent: "1.3.3.1.1.1", gen: 7 },
+  { id: "1.3.3.1.1.1.2", nameUr: "محمد اقبال", nameEn: "Muhammad Iqbal", parent: "1.3.3.1.1.1", gen: 7 },
+
+  { id: "1.3.3.1.1.1.1.1", nameUr: "محمد اشرف", nameEn: "Muhammad Ashraf", parent: "1.3.3.1.1.1.1", gen: 8 },
+  { id: "1.3.3.1.1.1.1.2", nameUr: "محمد افضال", nameEn: "Muhammad Afzaal", parent: "1.3.3.1.1.1.1", gen: 8 },
+  { id: "1.3.3.1.1.1.1.3", nameUr: "محمد اکرم", nameEn: "Muhammad Akram", parent: "1.3.3.1.1.1.1", gen: 8 },
+
+  { id: "1.3.3.1.1.1.1.3.1", nameUr: "محمد علیم", nameEn: "Muhammad Aleem", parent: "1.3.3.1.1.1.1.3", gen: 9 },
+  { id: "1.3.3.1.1.1.1.3.2", nameUr: "محمد کلیم", nameEn: "Muhammad Kaleem", parent: "1.3.3.1.1.1.1.3", gen: 9 },
+
+  { id: "1.3.3.1.1.1.2.1", nameUr: "ناصر اقبال", nameEn: "Nasir Iqbal", parent: "1.3.3.1.1.1.2", gen: 8 },
+  { id: "1.3.3.1.1.1.2.2", nameUr: "قیصر اقبال", nameEn: "Qaiser Iqbal", parent: "1.3.3.1.1.1.2", gen: 8 },
+
+  { id: "1.3.3.1.2.1", nameUr: "برکت علی خان", nameEn: "Barkat Ali Khan", parent: "1.3.3.1.2", gen: 6 },
+  { id: "1.3.3.1.2.1.1", nameUr: "مسعود احمد", nameEn: "Masood Ahmed", parent: "1.3.3.1.2.1", gen: 7 },
+  { id: "1.3.3.1.2.1.2", nameUr: "محمود مصطفی", nameEn: "Mahmood Mustafa", parent: "1.3.3.1.2.1", gen: 7 },
+
+  { id: "1.3.3.1.2.1.2.1", nameUr: "سجاد محمود", nameEn: "Sajjad Mehmood", parent: "1.3.3.1.2.1.2", gen: 8 },
+  { id: "1.3.3.1.2.1.2.2", nameUr: "عبد الرؤف", nameEn: "Abdul Rauf", parent: "1.3.3.1.2.1.2", gen: 8 },
+
+  { id: "1.3.3.1.2.1.2.1.1", nameUr: "شیراز محمود", nameEn: "Shiraz Mehmood", parent: "1.3.3.1.2.1.2.1", gen: 9 },
+  { id: "1.3.3.1.2.1.2.1.2", nameUr: "افراز محمود", nameEn: "Afraz Mehmood", parent: "1.3.3.1.2.1.2.1", gen: 9 },
+
+  { id: "1.3.3.1.2.1.2.2.1", nameUr: "حمزہ رؤف", nameEn: "Hamza Rauf", parent: "1.3.3.1.2.1.2.2", gen: 9 },
+  { id: "1.3.3.1.2.1.2.2.2", nameUr: "عسان رؤف", nameEn: "Issan Rauf", parent: "1.3.3.1.2.1.2.2", gen: 9 },
+
+  { id: "1.3.3.1.3.1", nameUr: "محمد اکبر", nameEn: "Muhammad Akbar", parent: "1.3.3.1.3", gen: 6 },
+  { id: "1.3.3.1.3.2", nameUr: "محمد انور", nameEn: "Muhammad Anwar", parent: "1.3.3.1.3", gen: 6 },
+
+  { id: "1.3.3.1.3.1.1", nameUr: "محمد ظہیر", nameEn: "Mohammad Zahir", parent: "1.3.3.1.3.1", gen: 7 },
+  { id: "1.3.3.1.3.1.2", nameUr: "محمد اختر", nameEn: "Mohammad Akhtar", parent: "1.3.3.1.3.1", gen: 7 },
+  { id: "1.3.3.1.3.1.3", nameUr: "محمد اظہر", nameEn: "Mohammad Azhar", parent: "1.3.3.1.3.1", gen: 7 },
+  { id: "1.3.3.1.3.1.4", nameUr: "محمد امجد", nameEn: "Mohammad Amjad", parent: "1.3.3.1.3.1", gen: 7 },
+  { id: "1.3.3.1.3.1.5", nameUr: "محمد اشرف", nameEn: "Mohammad Ashraf", parent: "1.3.3.1.3.1", gen: 7 },
+  { id: "1.3.3.1.3.1.4.1", nameUr: "علی امجد", nameEn: "Ali Amjad", parent: "1.3.3.1.3.1.4", gen: 8 },
+
+  { id: "1.3.3.1.3.2.1", nameUr: "آصف انور", nameEn: "Asif Anwar", parent: "1.3.3.1.3.2", gen: 7 },
+  { id: "1.3.3.1.3.2.2", nameUr: "اشفاق انور", nameEn: "Ishfaq Anwar", parent: "1.3.3.1.3.2", gen: 7 },
+  { id: "1.3.3.1.3.2.3", nameUr: "افتاب انور", nameEn: "Aftab Anwar", parent: "1.3.3.1.3.2", gen: 7 },
+
+  { id: "1.3.3.1.3.2.3.1", nameUr: "عمر افتاب", nameEn: "Umer Aftab", parent: "1.3.3.1.3.2.3", gen: 8 },
+  { id: "1.3.3.1.3.2.3.2", nameUr: "خضر افتاب", nameEn: "Khizer Aftab", parent: "1.3.3.1.3.2.3", gen: 8 },
+  { id: "1.3.3.1.3.2.3.3", nameUr: "حیدر افتاب", nameEn: "Haider Aftab", parent: "1.3.3.1.3.2.3", gen: 8 },
+
+  { id: "1.3.3.2.1", nameUr: "عبد اللہ", nameEn: "Abdullah", parent: "1.3.3.2", gen: 5 },
+  { id: "1.3.3.2.2", nameUr: "مراد علی", nameEn: "Murad Ali", parent: "1.3.3.2", gen: 5 },
+
+  { id: "1.3.3.2.2.1", nameUr: "محمد احمد", nameEn: "Muhammad Ahmed", parent: "1.3.3.2.2", gen: 6 },
+  { id: "1.3.3.2.2.2", nameUr: "محمود الحق", nameEn: "Mehmood ul Haq", parent: "1.3.3.2.2", gen: 6 },
+  { id: "1.3.3.2.2.3", nameUr: "بشارت حسین", nameEn: "Bisharat Hussain", parent: "1.3.3.2.2", gen: 6 },
+  { id: "1.3.3.2.2.4", nameUr: "عبد الحلیم", nameEn: "Abdul Haleem", parent: "1.3.3.2.2", gen: 6 },
+
+  { id: "1.3.3.2.2.1.1", nameUr: "محمود احمد", nameEn: "Mehmood Ahmed", parent: "1.3.3.2.2.1", gen: 7 },
+  { id: "1.3.3.2.2.1.2", nameUr: "فاروق احمد", nameEn: "Farooq Ahmed", parent: "1.3.3.2.2.1", gen: 7 },
+  { id: "1.3.3.2.2.1.2.1", nameUr: "داؤد احمد", nameEn: "Dawood Ahmed", parent: "1.3.3.2.2.1.2", gen: 8 },
+
+  { id: "1.3.3.2.2.4.1", nameUr: "نسیم احمد", nameEn: "Naseem Ahmed", parent: "1.3.3.2.2.4", gen: 7 },
+  { id: "1.3.3.2.2.4.2", nameUr: "امین خالد", nameEn: "Ameen Khalid", parent: "1.3.3.2.2.4", gen: 7 },
+  { id: "1.3.3.2.2.4.3", nameUr: "عبد الکریم", nameEn: "Abdul Karim", parent: "1.3.3.2.2.4", gen: 7 },
+
+  { id: "1.3.3.2.2.4.1.1", nameUr: "وسیم احمد", nameEn: "Waseem Ahmed", parent: "1.3.3.2.2.4.1", gen: 8 },
+  { id: "1.3.3.2.2.4.1.2", nameUr: "سلطان احمد", nameEn: "Sultan Ahmed", parent: "1.3.3.2.2.4.1", gen: 8 },
+  { id: "1.3.3.2.2.4.1.3", nameUr: "مبین شہزاد", nameEn: "Mubeen Shahzad", parent: "1.3.3.2.2.4.1", gen: 8 },
+
+  { id: "1.3.3.2.2.4.2.1", nameUr: "مبشر احمد", nameEn: "Mubashir Ahmed", parent: "1.3.3.2.2.4.2", gen: 8 },
+  { id: "1.3.3.2.2.4.2.2", nameUr: "شیراز احمد", nameEn: "Shiraz Ahmed", parent: "1.3.3.2.2.4.2", gen: 8 },
+
+  { id: "1.3.3.2.2.4.3.1", nameUr: "سجیل احمد", nameEn: "Sajeel Ahmed", parent: "1.3.3.2.2.4.3", gen: 8 },
+  { id: "1.3.3.2.2.4.3.2", nameUr: "فاضل احمد", nameEn: "Fazil Ahmed", parent: "1.3.3.2.2.4.3", gen: 8 },
+  { id: "1.3.3.2.2.4.3.3", nameUr: "شہاب احمد", nameEn: "Shahab Ahmed", parent: "1.3.3.2.2.4.3", gen: 8 },
+
+  // ══════════════════════════════════════════════════════════════
+  // 2ND SON LINEAGE — Imam Bakhsh (امام بخش) — id prefix "2"
+  // ══════════════════════════════════════════════════════════════
+  // Gen 2
+  { id: "2.1", nameUr: "حافظ محمد یار", nameEn: "Hafiz Muhammad Yar", parent: "2", gen: 2 },
+
+  // Gen 3 — sons of Hafiz Muhammad Yar
+  { id: "2.1.1", nameUr: "شیخ احمد", nameEn: "Sheikh Ahmad", parent: "2.1", gen: 3 },
+  { id: "2.1.2", nameUr: "محمد بخش", nameEn: "Muhammad Bakhsh", parent: "2.1", gen: 3 },
+  { id: "2.1.3", nameUr: "حاجی غلام قاسم", nameEn: "Haji Ghulam Qasim", parent: "2.1", gen: 3 },
+
+  // Gen 4 — sons of Sheikh Ahmad
+  { id: "2.1.1.1", nameUr: "فضل الٰہی", nameEn: "Fazal Ilahi", parent: "2.1.1", gen: 4 },
+  { id: "2.1.1.2", nameUr: "کرم الٰہی", nameEn: "Karam Ilahi", parent: "2.1.1", gen: 4 },
+  { id: "2.1.1.3", nameUr: "حسن علی", nameEn: "Hassan Ali", parent: "2.1.1", gen: 4 },
+
+  // Gen 5 — sons of Fazal Ilahi
+  { id: "2.1.1.1.1", nameUr: "نور دین", nameEn: "Noor Din", parent: "2.1.1.1", gen: 5 },
+  { id: "2.1.1.1.2", nameUr: "جلال دین", nameEn: "Jalal Din", parent: "2.1.1.1", gen: 5 },
+  { id: "2.1.1.1.3", nameUr: "امام دین", nameEn: "Imam Din", parent: "2.1.1.1", gen: 5 },
+
+  // Gen 6 — sons of Noor Din
+  { id: "2.1.1.1.1.1", nameUr: "حامد علی", nameEn: "Hamid Ali", parent: "2.1.1.1.1", gen: 6 },
+  { id: "2.1.1.1.1.2", nameUr: "محمد عالم", nameEn: "Muhammad Alam", parent: "2.1.1.1.1", gen: 6 },
+
+  // sons of Muhammad Alam
+  { id: "2.1.1.1.1.2.1", nameUr: "نذیر احمد", nameEn: "Nazir Ahmad", parent: "2.1.1.1.1.2", gen: 7 },
+  { id: "2.1.1.1.1.2.2", nameUr: "عزیز احمد", nameEn: "Aziz Ahmad", parent: "2.1.1.1.1.2", gen: 7 },
+
+  // sons of Jalal Din
+  { id: "2.1.1.1.2.1", nameUr: "عنایت اللہ", nameEn: "Inayat Ullah", parent: "2.1.1.1.2", gen: 6 },
+  { id: "2.1.1.1.2.2", nameUr: "عطاء الٰہی", nameEn: "Ata Ilahi", parent: "2.1.1.1.2", gen: 6 },
+  { id: "2.1.1.1.2.3", nameUr: "محمد شفیع", nameEn: "Muhammad Shafi", parent: "2.1.1.1.2", gen: 6 },
+
+  // sons of Inayat Ullah
+  { id: "2.1.1.1.2.1.1", nameUr: "عبد الحق", nameEn: "Abdul Haq", parent: "2.1.1.1.2.1", gen: 7 },
+  { id: "2.1.1.1.2.1.2", nameUr: "فضل حق", nameEn: "Fazal Haq", parent: "2.1.1.1.2.1", gen: 7 },
+  { id: "2.1.1.1.2.1.3", nameUr: "محمد انور", nameEn: "Muhammad Anwar", parent: "2.1.1.1.2.1", gen: 7 },
+
+  // sons of Abdul Haq
+  { id: "2.1.1.1.2.1.1.1", nameUr: "ارشد محمود", nameEn: "Arshad Mahmood", parent: "2.1.1.1.2.1.1", gen: 8 },
+  { id: "2.1.1.1.2.1.1.2", nameUr: "اختر محمود", nameEn: "Akhtar Mahmood", parent: "2.1.1.1.2.1.1", gen: 8 },
+
+  // sons of Muhammad Shafi
+  { id: "2.1.1.1.2.3.1", nameUr: "رفیق احمد", nameEn: "Rafiq Ahmad", parent: "2.1.1.1.2.3", gen: 7 },
+  { id: "2.1.1.1.2.3.2", nameUr: "مشتاق احمد", nameEn: "Mushtaq Ahmad", parent: "2.1.1.1.2.3", gen: 7 },
+  { id: "2.1.1.1.2.3.3", nameUr: "محمد لطیف احمد", nameEn: "Muhammad Latif Ahmad", parent: "2.1.1.1.2.3", gen: 7 },
+
+  { id: "2.1.1.1.2.3.1.1", nameUr: "محمد عمران", nameEn: "Muhammad Imran", parent: "2.1.1.1.2.3.1", gen: 8 },
+  { id: "2.1.1.1.2.3.1.2", nameUr: "محمد عرفان", nameEn: "Muhammad Irfan", parent: "2.1.1.1.2.3.1", gen: 8 },
+  { id: "2.1.1.1.2.3.2.1", nameUr: "ضمیر احمد", nameEn: "Zamir Ahmad", parent: "2.1.1.1.2.3.2", gen: 8 },
+  { id: "2.1.1.1.2.3.2.2", nameUr: "بلال احمد", nameEn: "Bilal Ahmad", parent: "2.1.1.1.2.3.2", gen: 8 },
+  { id: "2.1.1.1.2.3.2.3", nameUr: "عامر مشتاق", nameEn: "Amir Mushtaq", parent: "2.1.1.1.2.3.2", gen: 8 },
+  { id: "2.1.1.1.2.3.3.1", nameUr: "وقاص احمد", nameEn: "Waqas Ahmad", parent: "2.1.1.1.2.3.3", gen: 8 },
+  { id: "2.1.1.1.2.3.3.2", nameUr: "شہزاد احمد", nameEn: "Shahzad Ahmad", parent: "2.1.1.1.2.3.3", gen: 8 },
+  { id: "2.1.1.1.2.3.3.3", nameUr: "ممتاز احمد", nameEn: "Mumtaz Ahmad", parent: "2.1.1.1.2.3.3", gen: 8 },
+
+  // sons of Hassan Ali
+  { id: "2.1.1.3.1", nameUr: "احمدالدین ضلعدار", nameEn: "Ahmaduddin Zilladar", parent: "2.1.1.3", gen: 5 },
+  { id: "2.1.1.3.2", nameUr: "محبوب عالم", nameEn: "Mahboob Alam", parent: "2.1.1.3", gen: 5 },
+
+  // sons of Ahmaduddin Zilladar
+  { id: "2.1.1.3.1.1", nameUr: "سردار عالم", nameEn: "Sardar Alam", parent: "2.1.1.3.1", gen: 6 },
+  { id: "2.1.1.3.1.2", nameUr: "حبیب اللہ", nameEn: "Habib Ullah", parent: "2.1.1.3.1", gen: 6 },
+  { id: "2.1.1.3.1.3", nameUr: "عطاء اللہ", nameEn: "Ataullah Khan", parent: "2.1.1.3.1", gen: 6 },
+  { id: "2.1.1.3.1.4", nameUr: "عنایت اللہ", nameEn: "Inayat Ullah", parent: "2.1.1.3.1", gen: 6 },
+  { id: "2.1.1.3.1.5", nameUr: "محمد حسین", nameEn: "Muhammad Hussain", parent: "2.1.1.3.1", gen: 6 },
+
+  { id: "2.1.1.3.1.1.1", nameUr: "منور احمد", nameEn: "Munawwar Ahmad", parent: "2.1.1.3.1.1", gen: 7 },
+
+  // sons of Ataullah Khan
+  { id: "2.1.1.3.1.3.1", nameUr: "جاوید اقبال", nameEn: "Javed Iqbal", parent: "2.1.1.3.1.3", gen: 7 },
+  { id: "2.1.1.3.1.3.2", nameUr: "شفیع الرحمن", nameEn: "Shafi ur Rahman", parent: "2.1.1.3.1.3", gen: 7 },
+  { id: "2.1.1.3.1.3.3", nameUr: "خالد الاقبال", nameEn: "Khalid ul Iqbal", parent: "2.1.1.3.1.3", gen: 7 },
+  { id: "2.1.1.3.1.3.4", nameUr: "حبیب الرحمن", nameEn: "Habib ur Rahman", parent: "2.1.1.3.1.3", gen: 7 },
+  { id: "2.1.1.3.1.3.5", nameUr: "عبد الرحمن", nameEn: "Abdul Rahman", parent: "2.1.1.3.1.3", gen: 7 },
+  { id: "2.1.1.3.1.3.6", nameUr: "منظور احمد", nameEn: "Manzoor Ahmad", parent: "2.1.1.3.1.3", gen: 7 },
+
+  { id: "2.1.1.3.1.3.1.1", nameUr: "محمد قاسم", nameEn: "Muhammad Qasim", parent: "2.1.1.3.1.3.1", gen: 8 },
+  { id: "2.1.1.3.1.3.1.2", nameUr: "محمد شہباز", nameEn: "Muhammad Shahbaz", parent: "2.1.1.3.1.3.1", gen: 8 },
+  { id: "2.1.1.3.1.3.1.3", nameUr: "محمد کاشف", nameEn: "Muhammad Kashif", parent: "2.1.1.3.1.3.1", gen: 8 },
+  { id: "2.1.1.3.1.3.3.1", nameUr: "سعد اقبال", nameEn: "Saad Iqbal", parent: "2.1.1.3.1.3.3", gen: 8 },
+  { id: "2.1.1.3.1.3.3.2", nameUr: "اسد اقبال", nameEn: "Asad Iqbal", parent: "2.1.1.3.1.3.3", gen: 8 },
+  { id: "2.1.1.3.1.3.4.1", nameUr: "وسیم احمد", nameEn: "Waseem Ahmad", parent: "2.1.1.3.1.3.4", gen: 8 },
+  { id: "2.1.1.3.1.3.4.2", nameUr: "ندیم احمد", nameEn: "Nadeem Ahmad", parent: "2.1.1.3.1.3.4", gen: 8 },
+  { id: "2.1.1.3.1.3.5.1", nameUr: "احسان اللہ خان", nameEn: "Ahsan Ullah Khan", parent: "2.1.1.3.1.3.5", gen: 8 },
+  { id: "2.1.1.3.1.3.5.2", nameUr: "امان اللہ خان", nameEn: "Aman Ullah Khan", parent: "2.1.1.3.1.3.5", gen: 8 },
+  { id: "2.1.1.3.1.3.5.3", nameUr: "سیف اللہ خان", nameEn: "Saif Ullah Khan", parent: "2.1.1.3.1.3.5", gen: 8 },
+  { id: "2.1.1.3.1.3.5.4", nameUr: "شفیع الرحمن", nameEn: "Shafi ur Rahman", parent: "2.1.1.3.1.3.5", gen: 8 },
+
+  // sons of Inayat Ullah (2.1.1.3.1.4)
+  { id: "2.1.1.3.1.4.1", nameUr: "گلزار احمد", nameEn: "Gulzar Ahmad", parent: "2.1.1.3.1.4", gen: 7 },
+  { id: "2.1.1.3.1.4.2", nameUr: "محمد انور", nameEn: "Muhammad Anwar", parent: "2.1.1.3.1.4", gen: 7 },
+  { id: "2.1.1.3.1.4.3", nameUr: "ذوالفقار احمد", nameEn: "Zulfiqar Ahmad", parent: "2.1.1.3.1.4", gen: 7 },
+  { id: "2.1.1.3.1.4.4", nameUr: "سرفراز احمد", nameEn: "Sarfaraz Ahmad", parent: "2.1.1.3.1.4", gen: 7 },
+
+  { id: "2.1.1.3.1.4.1.1", nameUr: "امجد گلزار", nameEn: "Amjad Gulzar", parent: "2.1.1.3.1.4.1", gen: 8 },
+  { id: "2.1.1.3.1.4.1.2", nameUr: "طاہر گلزار", nameEn: "Tahir Gulzar", parent: "2.1.1.3.1.4.1", gen: 8 },
+  { id: "2.1.1.3.1.4.1.3", nameUr: "زاہد گلزار", nameEn: "Zahid Gulzar", parent: "2.1.1.3.1.4.1", gen: 8 },
+  { id: "2.1.1.3.1.4.1.4", nameUr: "ارشد گلزار", nameEn: "Arshad Gulzar", parent: "2.1.1.3.1.4.1", gen: 8 },
+  { id: "2.1.1.3.1.4.1.5", nameUr: "اظہر گلزار", nameEn: "Azhar Gulzar", parent: "2.1.1.3.1.4.1", gen: 8 },
+  { id: "2.1.1.3.1.4.3.1", nameUr: "مدثر ذوالفقار", nameEn: "Mudassir Zulfiqar", parent: "2.1.1.3.1.4.3", gen: 8 },
+
+  // sons of Mahboob Alam
+  { id: "2.1.1.3.2.1", nameUr: "اکرام اللہ خان", nameEn: "Akram Ullah Khan", parent: "2.1.1.3.2", gen: 6 },
+  { id: "2.1.1.3.2.2", nameUr: "نصراللہ خان", nameEn: "Nasrullah Khan", parent: "2.1.1.3.2", gen: 6 },
+  { id: "2.1.1.3.2.3", nameUr: "عبد المجید", nameEn: "Abdul Majeed", parent: "2.1.1.3.2", gen: 6 },
+  { id: "2.1.1.3.2.4", nameUr: "عبد الحمید", nameEn: "Abdul Hameed", parent: "2.1.1.3.2", gen: 6 },
+
+  // sons of Akram Ullah Khan
+  { id: "2.1.1.3.2.1.1", nameUr: "ریاض قدیر", nameEn: "Riaz Qadir", parent: "2.1.1.3.2.1", gen: 7 },
+  { id: "2.1.1.3.2.1.2", nameUr: "اعجاز قدیر", nameEn: "Ijaz Qadir", parent: "2.1.1.3.2.1", gen: 7 },
+  { id: "2.1.1.3.2.1.3", nameUr: "ارشد اللہ خان", nameEn: "Arshad Ullah Khan", parent: "2.1.1.3.2.1", gen: 7 },
+  { id: "2.1.1.3.2.1.1.1", nameUr: "ذیشان", nameEn: "Zeeshan", parent: "2.1.1.3.2.1.1", gen: 8 },
+  { id: "2.1.1.3.2.1.1.2", nameUr: "ابراز", nameEn: "Abraz", parent: "2.1.1.3.2.1.1", gen: 8 },
+  { id: "2.1.1.3.2.1.1.3", nameUr: "سفیان", nameEn: "Sufyan", parent: "2.1.1.3.2.1.1", gen: 8 },
+  { id: "2.1.1.3.2.1.2.1", nameUr: "سہیل اعجاز", nameEn: "Sohail Ijaz", parent: "2.1.1.3.2.1.2", gen: 8 },
+  { id: "2.1.1.3.2.1.2.2", nameUr: "احمد اعجاز", nameEn: "Ahmad Ijaz", parent: "2.1.1.3.2.1.2", gen: 8 },
+  { id: "2.1.1.3.2.1.2.3", nameUr: "محسن اعجاز", nameEn: "Mohsin Ijaz", parent: "2.1.1.3.2.1.2", gen: 8 },
+  { id: "2.1.1.3.2.1.3.1", nameUr: "رضا اکرم", nameEn: "Raza Akram", parent: "2.1.1.3.2.1.3", gen: 8 },
+  { id: "2.1.1.3.2.1.3.2", nameUr: "حیدر اکرام", nameEn: "Haidar Akram", parent: "2.1.1.3.2.1.3", gen: 8 },
+
+  // sons of Nasrullah Khan
+  { id: "2.1.1.3.2.2.1", nameUr: "ظفر اقبال", nameEn: "Zafar Iqbal", parent: "2.1.1.3.2.2", gen: 7 },
+  { id: "2.1.1.3.2.2.2", nameUr: "محمد اقبال", nameEn: "Muhammad Iqbal", parent: "2.1.1.3.2.2", gen: 7 },
+  { id: "2.1.1.3.2.2.3", nameUr: "ناصر اقبال", nameEn: "Nasir Iqbal", parent: "2.1.1.3.2.2", gen: 7 },
+  { id: "2.1.1.3.2.2.1.1", nameUr: "رضوان ظفر", nameEn: "Rizwan Zafar", parent: "2.1.1.3.2.2.1", gen: 8 },
+  { id: "2.1.1.3.2.2.1.2", nameUr: "عدنان ظفر", nameEn: "Adnan Zafar", parent: "2.1.1.3.2.2.1", gen: 8 },
+  { id: "2.1.1.3.2.2.1.3", nameUr: "فرحان ظفر", nameEn: "Farhan Zafar", parent: "2.1.1.3.2.2.1", gen: 8 },
+  { id: "2.1.1.3.2.2.2.1", nameUr: "نعمان اقبال", nameEn: "Noman Iqbal", parent: "2.1.1.3.2.2.2", gen: 8 },
+  { id: "2.1.1.3.2.2.2.2", nameUr: "عثمان اقبال", nameEn: "Usman Iqbal", parent: "2.1.1.3.2.2.2", gen: 8 },
+  { id: "2.1.1.3.2.2.3.1", nameUr: "محمد عبداللہ", nameEn: "Muhammad Abdullah", parent: "2.1.1.3.2.2.3", gen: 8 },
+  { id: "2.1.1.3.2.2.3.2", nameUr: "محمد اسد اللہ", nameEn: "Muhammad Asad Ullah", parent: "2.1.1.3.2.2.3", gen: 8 },
+
+  // sons of Abdul Majeed
+  { id: "2.1.1.3.2.3.1", nameUr: "خالد قدیر", nameEn: "Khalid Qadir", parent: "2.1.1.3.2.3", gen: 7 },
+  { id: "2.1.1.3.2.3.2", nameUr: "عابد قدیر", nameEn: "Abid Qadir", parent: "2.1.1.3.2.3", gen: 7 },
+  { id: "2.1.1.3.2.3.3", nameUr: "شاہد قدیر", nameEn: "Shahid Qadir", parent: "2.1.1.3.2.3", gen: 7 },
+  { id: "2.1.1.3.2.3.4", nameUr: "زاہد قدیر", nameEn: "Zahid Qadir", parent: "2.1.1.3.2.3", gen: 7 },
+  { id: "2.1.1.3.2.3.5", nameUr: "حامد قدیر", nameEn: "Hamid Qadir", parent: "2.1.1.3.2.3", gen: 7 },
+  { id: "2.1.1.3.2.3.6", nameUr: "احمد قدیر", nameEn: "Ahmad Qadir", parent: "2.1.1.3.2.3", gen: 7 },
+  { id: "2.1.1.3.2.3.1.1", nameUr: "شہزاد مجید", nameEn: "Shahzad Majeed", parent: "2.1.1.3.2.3.1", gen: 8 },
+  { id: "2.1.1.3.2.3.1.2", nameUr: "شہباز مجید", nameEn: "Shahbaz Majeed", parent: "2.1.1.3.2.3.1", gen: 8 },
+  { id: "2.1.1.3.2.3.1.3", nameUr: "شیراز مجید", nameEn: "Shiraz Majeed", parent: "2.1.1.3.2.3.1", gen: 8 },
+  { id: "2.1.1.3.2.3.2.1", nameUr: "خرم سلیم", nameEn: "Khurram Saleem", parent: "2.1.1.3.2.3.2", gen: 8 },
+  { id: "2.1.1.3.2.3.4.1", nameUr: "عثمان زاہد", nameEn: "Usman Zahid", parent: "2.1.1.3.2.3.4", gen: 8 },
+  { id: "2.1.1.3.2.3.4.2", nameUr: "علی زاہد", nameEn: "Ali Zahid", parent: "2.1.1.3.2.3.4", gen: 8 },
+
+  // sons of Abdul Hameed (2.1.1.3.2.4)
+  { id: "2.1.1.3.2.4.1", nameUr: "ندیم احمد", nameEn: "Nadeem Ahmad", parent: "2.1.1.3.2.4", gen: 7 },
+  { id: "2.1.1.3.2.4.2", nameUr: "وسیم احمد", nameEn: "Waseem Ahmad", parent: "2.1.1.3.2.4", gen: 7 },
+  { id: "2.1.1.3.2.4.3", nameUr: "نعیم اقبال", nameEn: "Naeem Iqbal", parent: "2.1.1.3.2.4", gen: 7 },
+  { id: "2.1.1.3.2.4.4", nameUr: "سلیم اقبال", nameEn: "Saleem Iqbal", parent: "2.1.1.3.2.4", gen: 7 },
+  { id: "2.1.1.3.2.4.5", nameUr: "قیصر حمید", nameEn: "Qaisar Hameed", parent: "2.1.1.3.2.4", gen: 7 },
+
+  // sons of Muhammad Bakhsh (2.1.2)
+  { id: "2.1.2.1", nameUr: "ابراہیم", nameEn: "Ibrahim", parent: "2.1.2", gen: 4 },
+  { id: "2.1.2.2", nameUr: "عبداللہ خان", nameEn: "Abdullah Khan", parent: "2.1.2", gen: 4 },
+  { id: "2.1.2.3", nameUr: "غلام علی", nameEn: "Ghulam Ali", parent: "2.1.2", gen: 4 },
+
+  // sons of Abdullah Khan (2.1.2.2)
+  { id: "2.1.2.2.1", nameUr: "نور دین", nameEn: "Noor Din", parent: "2.1.2.2", gen: 5 },
+  { id: "2.1.2.2.2", nameUr: "مظفر الدین", nameEn: "Muzaffar ud Din", parent: "2.1.2.2", gen: 5 },
+  { id: "2.1.2.2.2.1", nameUr: "عبد المجید", nameEn: "Abdul Majeed", parent: "2.1.2.2.2", gen: 6 },
+  { id: "2.1.2.2.2.2", nameUr: "نصراللہ", nameEn: "Nasrullah", parent: "2.1.2.2.2", gen: 6 },
+  { id: "2.1.2.2.2.1.1", nameUr: "جاوید اختر", nameEn: "Javed Akhtar", parent: "2.1.2.2.2.1", gen: 7 },
+  { id: "2.1.2.2.2.1.1.1", nameUr: "ذیشان جاوید", nameEn: "Zeeshan Javed", parent: "2.1.2.2.2.1.1", gen: 8 },
+  { id: "2.1.2.2.2.1.1.2", nameUr: "ارسلان جاوید", nameEn: "Arslan Javed", parent: "2.1.2.2.2.1.1", gen: 8 },
+  { id: "2.1.2.2.2.2.1", nameUr: "عرفان نوید", nameEn: "Irfan Naveed", parent: "2.1.2.2.2.2", gen: 7 },
+  { id: "2.1.2.2.2.2.2", nameUr: "ارزاد نوید", nameEn: "Aezad Naveed", parent: "2.1.2.2.2.2", gen: 7 },
+  { id: "2.1.2.2.2.2.1.1", nameUr: "جنید", nameEn: "Junaid", parent: "2.1.2.2.2.2.1", gen: 8 },
+  { id: "2.1.2.2.2.2.2.1", nameUr: "مظفر نوید", nameEn: "Muzaffar Naveed", parent: "2.1.2.2.2.2.2", gen: 8 },
+  { id: "2.1.2.2.2.2.2.2", nameUr: "داود نوید", nameEn: "Dawood Naveed", parent: "2.1.2.2.2.2.2", gen: 8 },
+
+  // sons of Ghulam Ali (2.1.2.3)
+  { id: "2.1.2.3.1", nameUr: "عبد الحمید خان", nameEn: "Abdul Hameed Khan", parent: "2.1.2.3", gen: 5 },
+  { id: "2.1.2.3.1.1", nameUr: "محمد سعید خان", nameEn: "Muhammad Saeed Khan", parent: "2.1.2.3.1", gen: 6 },
+  { id: "2.1.2.3.1.2", nameUr: "ڈاکٹر محمد اختر خان", nameEn: "Dr. Muhammad Akhtar Khan", parent: "2.1.2.3.1", gen: 6 },
+  { id: "2.1.2.3.1.1.1", nameUr: "عامر حمید", nameEn: "Amir Hameed", parent: "2.1.2.3.1.1", gen: 7 },
+  { id: "2.1.2.3.1.1.2", nameUr: "فاروق حمید", nameEn: "Farooq Hameed", parent: "2.1.2.3.1.1", gen: 7 },
+  { id: "2.1.2.3.1.1.3", nameUr: "ممتاز حمید", nameEn: "Mumtaz Hameed", parent: "2.1.2.3.1.1", gen: 7 },
+  { id: "2.1.2.3.1.1.4", nameUr: "اعجاز حمید", nameEn: "Ijaz Hameed", parent: "2.1.2.3.1.1", gen: 7 },
+  { id: "2.1.2.3.1.1.2.1", nameUr: "مرتضیٰ حمید", nameEn: "Murtaza Hameed", parent: "2.1.2.3.1.1.2", gen: 8 },
+  { id: "2.1.2.3.1.1.3.1", nameUr: "سعد حمید", nameEn: "Saad Hameed", parent: "2.1.2.3.1.1.3", gen: 8 },
+  { id: "2.1.2.3.1.1.3.2", nameUr: "اسد حمید", nameEn: "Asad Hameed", parent: "2.1.2.3.1.1.3", gen: 8 },
+  { id: "2.1.2.3.1.1.4.1", nameUr: "طارق حمید", nameEn: "Tariq Hameed", parent: "2.1.2.3.1.1.4", gen: 8 },
+  { id: "2.1.2.3.1.1.4.2", nameUr: "محمد حمید", nameEn: "Muhammad Hameed", parent: "2.1.2.3.1.1.4", gen: 8 },
+  { id: "2.1.2.3.1.2.1", nameUr: "احمد حمید", nameEn: "Ahmad Hameed", parent: "2.1.2.3.1.2", gen: 7 },
+
+  // sons of Haji Ghulam Qasim (2.1.3)
+  { id: "2.1.3.1", nameUr: "احمد دین", nameEn: "Ahmad Din", parent: "2.1.3", gen: 4 },
+  { id: "2.1.3.2", nameUr: "خان بہادر امام الدین", nameEn: "Khan Bahadur Imam ud Din", parent: "2.1.3", gen: 4 },
+  { id: "2.1.3.3", nameUr: "عزیز الدین", nameEn: "Aziz ud Din", parent: "2.1.3", gen: 4 },
+  { id: "2.1.3.4", nameUr: "رحیم بخش", nameEn: "Raheem Bakhsh", parent: "2.1.3", gen: 4 },
+
+  // sons of Ahmad Din (2.1.3.1)
+  { id: "2.1.3.1.1", nameUr: "محمد عالم", nameEn: "Muhammad Alam", parent: "2.1.3.1", gen: 5 },
+  { id: "2.1.3.1.2", nameUr: "جلال الدین", nameEn: "Jalal ud Din", parent: "2.1.3.1", gen: 5 },
+
+  // sons of Muhammad Alam (2.1.3.1.1)
+  { id: "2.1.3.1.1.1", nameUr: "محمود احمد خان", nameEn: "Mahmood Ahmad Khan", parent: "2.1.3.1.1", gen: 6 },
+  { id: "2.1.3.1.1.2", nameUr: "اصغر علی خان", nameEn: "Asghar Ali Khan", parent: "2.1.3.1.1", gen: 6 },
+  { id: "2.1.3.1.1.3", nameUr: "حبیب اللہ خان", nameEn: "Habib Ullah Khan", parent: "2.1.3.1.1", gen: 6 },
+
+  // sons of Mahmood Ahmad Khan
+  { id: "2.1.3.1.1.1.1", nameUr: "محمد عرفان", nameEn: "Muhammad Irfan", parent: "2.1.3.1.1.1", gen: 7 },
+  { id: "2.1.3.1.1.1.2", nameUr: "محمد عثمان", nameEn: "Muhammad Usman", parent: "2.1.3.1.1.1", gen: 7 },
+  { id: "2.1.3.1.1.1.3", nameUr: "محمد عمران", nameEn: "Muhammad Imran", parent: "2.1.3.1.1.1", gen: 7 },
+  { id: "2.1.3.1.1.1.4", nameUr: "محمد سلمان", nameEn: "Muhammad Salman", parent: "2.1.3.1.1.1", gen: 7 },
+  { id: "2.1.3.1.1.1.5", nameUr: "محمد نعمان", nameEn: "Muhammad Noman", parent: "2.1.3.1.1.1", gen: 7 },
+  { id: "2.1.3.1.1.1.6", nameUr: "احمد غزالی", nameEn: "Ahmad Ghazali", parent: "2.1.3.1.1.1", gen: 7 },
+  { id: "2.1.3.1.1.1.2.1", nameUr: "خزیمہ محمد", nameEn: "Khuzaima Muhammad", parent: "2.1.3.1.1.1.2", gen: 8 },
+  { id: "2.1.3.1.1.1.2.2", nameUr: "حسن البنا محمد", nameEn: "Hassan Albana Muhammad", parent: "2.1.3.1.1.1.2", gen: 8 },
+  { id: "2.1.3.1.1.1.2.3", nameUr: "شمس ابراہیم محمد", nameEn: "Shamas Ibrahim Muhammad", parent: "2.1.3.1.1.1.2", gen: 8 },
+  { id: "2.1.3.1.1.1.1.1", nameUr: "زید محمد", nameEn: "Zaid Muhammad", parent: "2.1.3.1.1.1.1", gen: 8 },
+  { id: "2.1.3.1.1.1.1.2", nameUr: "اسامہ عرفان", nameEn: "Usama Irfan", parent: "2.1.3.1.1.1.1", gen: 8 },
+  { id: "2.1.3.1.1.1.1.3", nameUr: "مسلم زبیر", nameEn: "Muslim Zubair", parent: "2.1.3.1.1.1.1", gen: 8 },
+  { id: "2.1.3.1.1.1.4.1", nameUr: "حذیفہ", nameEn: "Huzaifa", parent: "2.1.3.1.1.1.4", gen: 8 },
+  { id: "2.1.3.1.1.1.4.2", nameUr: "انس محمود", nameEn: "Anas Mahmood", parent: "2.1.3.1.1.1.4", gen: 8 },
+  { id: "2.1.3.1.1.1.1.3.1", nameUr: "محمد سلمان", nameEn: "Muhammad Salman", parent: "2.1.3.1.1.1.1.3", gen: 9 },
+  { id: "2.1.3.1.1.1.1.3.2", nameUr: "محمد سلیمان", nameEn: "Muhammad Suleman", parent: "2.1.3.1.1.1.1.3", gen: 9 },
+  { id: "2.1.3.1.1.1.1.3.3", nameUr: "محمد عمران", nameEn: "Muhammad Imran", parent: "2.1.3.1.1.1.1.3", gen: 9 },
+  { id: "2.1.3.1.1.1.6.1", nameUr: "راضی احمد", nameEn: "Razi Ahmad", parent: "2.1.3.1.1.1.6", gen: 8 },
+  { id: "2.1.3.1.1.1.6.2", nameUr: "شبلی احمد", nameEn: "Shibli Ahmad", parent: "2.1.3.1.1.1.6", gen: 8 },
+
+  // sons of Asghar Ali Khan
+  { id: "2.1.3.1.1.2.1", nameUr: "محمد جنید", nameEn: "Muhammad Junaid", parent: "2.1.3.1.1.2", gen: 7 },
+  { id: "2.1.3.1.1.2.2", nameUr: "عبد الرؤف", nameEn: "Abdul Rauf", parent: "2.1.3.1.1.2", gen: 7 },
+  { id: "2.1.3.1.1.2.3", nameUr: "محمد فاروق", nameEn: "Muhammad Farooq", parent: "2.1.3.1.1.2", gen: 7 },
+  { id: "2.1.3.1.1.2.4", nameUr: "محمد نواز", nameEn: "Muhammad Nawaz", parent: "2.1.3.1.1.2", gen: 7 },
+  { id: "2.1.3.1.1.2.5", nameUr: "محمد اکبر", nameEn: "Muhammad Akbar", parent: "2.1.3.1.1.2", gen: 7 },
+  { id: "2.1.3.1.1.2.6", nameUr: "محمد صفدر", nameEn: "Muhammad Safdar", parent: "2.1.3.1.1.2", gen: 7 },
+  { id: "2.1.3.1.1.2.1.1", nameUr: "جان جنید", nameEn: "Jan Junaid", parent: "2.1.3.1.1.2.1", gen: 8 },
+  { id: "2.1.3.1.1.2.1.2", nameUr: "آدم جنید", nameEn: "Adam Junaid", parent: "2.1.3.1.1.2.1", gen: 8 },
+  { id: "2.1.3.1.1.2.2.1", nameUr: "حسن رضوان", nameEn: "Hassan Rizwan", parent: "2.1.3.1.1.2.2", gen: 8 },
+  { id: "2.1.3.1.1.2.2.2", nameUr: "توصیف", nameEn: "Tauseef", parent: "2.1.3.1.1.2.2", gen: 8 },
+  { id: "2.1.3.1.1.2.3.1", nameUr: "سلمان", nameEn: "Salman", parent: "2.1.3.1.1.2.3", gen: 8 },
+  { id: "2.1.3.1.1.2.4.1", nameUr: "علی نواز", nameEn: "Ali Nawaz", parent: "2.1.3.1.1.2.4", gen: 8 },
+  { id: "2.1.3.1.1.2.5.1", nameUr: "رضا اکبر", nameEn: "Raza Akbar", parent: "2.1.3.1.1.2.5", gen: 8 },
+  { id: "2.1.3.1.1.2.5.2", nameUr: "عمر اکبر", nameEn: "Umer Akbar", parent: "2.1.3.1.1.2.5", gen: 8 },
+  { id: "2.1.3.1.1.2.5.3", nameUr: "ذیشان اکبر", nameEn: "Zeeshan Akbar", parent: "2.1.3.1.1.2.5", gen: 8 },
+
+  // sons of Habib Ullah Khan (2.1.3.1.1.3)
+  { id: "2.1.3.1.1.3.1", nameUr: "خالد محمود", nameEn: "Khalid Mehmood", parent: "2.1.3.1.1.3", gen: 7 },
+  { id: "2.1.3.1.1.3.2", nameUr: "امان اللہ", nameEn: "Aman Ullah", parent: "2.1.3.1.1.3", gen: 7 },
+  { id: "2.1.3.1.1.3.3", nameUr: "فیض الرحمن", nameEn: "Faiz ur Rahman", parent: "2.1.3.1.1.3", gen: 7 },
+  { id: "2.1.3.1.1.3.4", nameUr: "عبد الرحمن", nameEn: "Abd ur Rahman", parent: "2.1.3.1.1.3", gen: 7 },
+  { id: "2.1.3.1.1.3.2.1", nameUr: "ظفر اللہ", nameEn: "Zafar Ullah", parent: "2.1.3.1.1.3.2", gen: 8 },
+  { id: "2.1.3.1.1.3.2.2", nameUr: "اسد اللہ", nameEn: "Asad Ullah", parent: "2.1.3.1.1.3.2", gen: 8 },
+  { id: "2.1.3.1.1.3.2.3", nameUr: "نصراللہ", nameEn: "Nasrullah", parent: "2.1.3.1.1.3.2", gen: 8 },
+  { id: "2.1.3.1.1.3.2.4", nameUr: "علی", nameEn: "Ali", parent: "2.1.3.1.1.3.2", gen: 8 },
+  { id: "2.1.3.1.1.3.3.1", nameUr: "عماد الرحمن", nameEn: "Imad ur Rahman", parent: "2.1.3.1.1.3.3", gen: 8 },
+  { id: "2.1.3.1.1.3.3.2", nameUr: "سعد الرحمن", nameEn: "Saad ur Rahman", parent: "2.1.3.1.1.3.3", gen: 8 },
+  { id: "2.1.3.1.1.3.4.1", nameUr: "امیر الرحمن", nameEn: "Amir ur Rahman", parent: "2.1.3.1.1.3.4", gen: 8 },
+  { id: "2.1.3.1.1.3.4.2", nameUr: "عبید الرحمن", nameEn: "Ubaid ur Rahman", parent: "2.1.3.1.1.3.4", gen: 8 },
+  { id: "2.1.3.1.1.3.4.3", nameUr: "عزیز الرحمن", nameEn: "Aziz ur Rahman", parent: "2.1.3.1.1.3.4", gen: 8 },
+
+  // sons of Jalal ud Din (2.1.3.1.2)
+  { id: "2.1.3.1.2.1", nameUr: "فضل الٰہی", nameEn: "Fazal Ilahi", parent: "2.1.3.1.2", gen: 6 },
+  { id: "2.1.3.1.2.2", nameUr: "عنایت اللہ", nameEn: "Inayat Ullah", parent: "2.1.3.1.2", gen: 6 },
+  { id: "2.1.3.1.2.3", nameUr: "نظیر حسین", nameEn: "Nazeer Hussain", parent: "2.1.3.1.2", gen: 6 },
+  { id: "2.1.3.1.2.4", nameUr: "بشیر احمد", nameEn: "Bashir Ahmad", parent: "2.1.3.1.2", gen: 6 },
+  { id: "2.1.3.1.2.5", nameUr: "عبد الحق", nameEn: "Abdul Haq", parent: "2.1.3.1.2", gen: 6 },
+  { id: "2.1.3.1.2.6", nameUr: "عبد العزیز", nameEn: "Abdul Aziz", parent: "2.1.3.1.2", gen: 6 },
+  { id: "2.1.3.1.2.7", nameUr: "عبد الرشید", nameEn: "Abdul Rasheed", parent: "2.1.3.1.2", gen: 6 },
+
+  { id: "2.1.3.1.2.4.1", nameUr: "محمد اشرف", nameEn: "Muhammad Ashraf", parent: "2.1.3.1.2.4", gen: 7 },
+  { id: "2.1.3.1.2.4.1.1", nameUr: "محمد شعیب", nameEn: "Muhammad Shoaib", parent: "2.1.3.1.2.4.1", gen: 8 },
+  { id: "2.1.3.1.2.4.1.2", nameUr: "محمد شجاع", nameEn: "Muhammad Shuja", parent: "2.1.3.1.2.4.1", gen: 8 },
+  { id: "2.1.3.1.2.4.1.1.1", nameUr: "محمد", nameEn: "Muhammad", parent: "2.1.3.1.2.4.1.1", gen: 9 },
+  { id: "2.1.3.1.2.4.1.1.2", nameUr: "ابوبکر", nameEn: "Abu Bakar", parent: "2.1.3.1.2.4.1.1", gen: 9 },
+
+  { id: "2.1.3.1.2.5.1", nameUr: "ظفر اقبال", nameEn: "Zafar Iqbal", parent: "2.1.3.1.2.5", gen: 7 },
+  { id: "2.1.3.1.2.6.1", nameUr: "عبد الحفیظ", nameEn: "Abdul Hafeez", parent: "2.1.3.1.2.6", gen: 7 },
+  { id: "2.1.3.1.2.6.2", nameUr: "عبد الواحد", nameEn: "Abdul Wahid", parent: "2.1.3.1.2.6", gen: 7 },
+  { id: "2.1.3.1.2.6.1.1", nameUr: "خرم شہزاد", nameEn: "Khurram Shahzad", parent: "2.1.3.1.2.6.1", gen: 8 },
+  { id: "2.1.3.1.2.6.1.2", nameUr: "محمد سلیم شہزاد", nameEn: "Muhammad Saleem Shahzad", parent: "2.1.3.1.2.6.1", gen: 8 },
+  { id: "2.1.3.1.2.6.1.3", nameUr: "محمد نعیم شہزاد", nameEn: "Muhammad Naeem Shahzad", parent: "2.1.3.1.2.6.1", gen: 8 },
+  { id: "2.1.3.1.2.6.1.4", nameUr: "وسیم شہزاد", nameEn: "Waseem Shahzad", parent: "2.1.3.1.2.6.1", gen: 8 },
+  { id: "2.1.3.1.2.6.2.1", nameUr: "عمر عزیز", nameEn: "Umar Aziz", parent: "2.1.3.1.2.6.2", gen: 8 },
+  { id: "2.1.3.1.2.6.2.2", nameUr: "محمد علی", nameEn: "Muhammad Ali", parent: "2.1.3.1.2.6.2", gen: 8 },
+  { id: "2.1.3.1.2.7.1", nameUr: "محمد اعجاز", nameEn: "Muhammad Ijaz", parent: "2.1.3.1.2.7", gen: 7 },
+  { id: "2.1.3.1.2.7.2", nameUr: "محمد سرفراز", nameEn: "Muhammad Sarfaraz", parent: "2.1.3.1.2.7", gen: 7 },
+
+  // sons of Khan Bahadur Imam ud Din (2.1.3.2)
+  { id: "2.1.3.2.1", nameUr: "محمد فاضل خان", nameEn: "Muhammad Fazil Khan", parent: "2.1.3.2", gen: 5 },
+  { id: "2.1.3.2.2", nameUr: "محمد صادق خان", nameEn: "Muhammad Sadiq Khan", parent: "2.1.3.2", gen: 5 },
+  { id: "2.1.3.2.3", nameUr: "حسن الدین", nameEn: "Hassan ud Din", parent: "2.1.3.2", gen: 5 },
+  { id: "2.1.3.2.4", nameUr: "حبیب اللہ خان", nameEn: "Habib Ullah Khan", parent: "2.1.3.2", gen: 5 },
+
+  { id: "2.1.3.2.1.1", nameUr: "محمد افضل", nameEn: "Muhammad Afzal", parent: "2.1.3.2.1", gen: 6 },
+  { id: "2.1.3.2.1.1.1", nameUr: "ارزاد افضل", nameEn: "Aezad Afzal", parent: "2.1.3.2.1.1", gen: 7 },
+  { id: "2.1.3.2.1.1.2", nameUr: "احمد بلال", nameEn: "Ahmad Bilal", parent: "2.1.3.2.1.1", gen: 7 },
+  { id: "2.1.3.2.1.1.3", nameUr: "سرمد جمال", nameEn: "Sarmad Jamal", parent: "2.1.3.2.1.1", gen: 7 },
+  { id: "2.1.3.2.1.1.1.1", nameUr: "فاروق حسن", nameEn: "Farooq Hassan", parent: "2.1.3.2.1.1.1", gen: 8 },
+  { id: "2.1.3.2.1.1.1.2", nameUr: "قاسم عمر", nameEn: "Qasim Umar", parent: "2.1.3.2.1.1.1", gen: 8 },
+  { id: "2.1.3.2.1.1.2.1", nameUr: "احمد دانیال", nameEn: "Ahmad Daniyal", parent: "2.1.3.2.1.1.2", gen: 8 },
+  { id: "2.1.3.2.1.1.2.2", nameUr: "احمد کمال", nameEn: "Ahmad Kamal", parent: "2.1.3.2.1.1.2", gen: 8 },
+
+  { id: "2.1.3.2.2.1", nameUr: "محمد صدیق", nameEn: "Muhammad Sadiq", parent: "2.1.3.2.2", gen: 6 },
+  { id: "2.1.3.2.3.1", nameUr: "انور حسین", nameEn: "Anwar Hussain", parent: "2.1.3.2.3", gen: 6 },
+  { id: "2.1.3.2.3.2", nameUr: "زاہد حسین", nameEn: "Zahid Hussain", parent: "2.1.3.2.3", gen: 6 },
+  { id: "2.1.3.2.3.3", nameUr: "منیر حسین", nameEn: "Munir Hussain", parent: "2.1.3.2.3", gen: 6 },
+  { id: "2.1.3.2.3.4", nameUr: "اختر حسین", nameEn: "Akhtar Hussain", parent: "2.1.3.2.3", gen: 6 },
+
+  // sons of Raheem Bakhsh (2.1.3.4)
+  { id: "2.1.3.4.1", nameUr: "برکت علی", nameEn: "Barkat Ali", parent: "2.1.3.4", gen: 5 },
+  { id: "2.1.3.4.1.1", nameUr: "ممتاز خان", nameEn: "Mumtaz Khan", parent: "2.1.3.4.1", gen: 6 },
+  { id: "2.1.3.4.1.2", nameUr: "امتیاز خان", nameEn: "Imtiaz Khan", parent: "2.1.3.4.1", gen: 6 },
+  { id: "2.1.3.4.1.3", nameUr: "سردار خان", nameEn: "Sardar Khan", parent: "2.1.3.4.1", gen: 6 },
+  { id: "2.1.3.4.1.4", nameUr: "احمد خان", nameEn: "Ahmad Khan", parent: "2.1.3.4.1", gen: 6 },
+  { id: "2.1.3.4.1.5", nameUr: "سرفراز خان", nameEn: "Sarfaraz Khan", parent: "2.1.3.4.1", gen: 6 },
+
+  { id: "2.1.3.4.1.1.1", nameUr: "محمد عمران ممتاز", nameEn: "Mohammad Imran Mumtaz", parent: "2.1.3.4.1.1", gen: 7 },
+  { id: "2.1.3.4.1.2.1", nameUr: "امجد علی خان", nameEn: "Amjad Ali Khan", parent: "2.1.3.4.1.2", gen: 7 },
+  { id: "2.1.3.4.1.2.2", nameUr: "طارق محمود", nameEn: "Tariq Mehmood", parent: "2.1.3.4.1.2", gen: 7 },
+  { id: "2.1.3.4.1.2.3", nameUr: "ارشد علی خان", nameEn: "Arshad Ali Khan", parent: "2.1.3.4.1.2", gen: 7 },
+  { id: "2.1.3.4.1.2.4", nameUr: "راشد امتیاز", nameEn: "Rashid Imtiaz", parent: "2.1.3.4.1.2", gen: 7 },
+  { id: "2.1.3.4.1.2.5", nameUr: "آصف امتیاز", nameEn: "Asif Imtiaz", parent: "2.1.3.4.1.2", gen: 7 },
+  { id: "2.1.3.4.1.2.6", nameUr: "سجاد احمد خان", nameEn: "Sajjad Ahmad Khan", parent: "2.1.3.4.1.2", gen: 7 },
+
+  { id: "2.1.3.4.1.4.1", nameUr: "صفی اللہ", nameEn: "Safi Ullah", parent: "2.1.3.4.1.4", gen: 7 },
+  { id: "2.1.3.4.1.4.2", nameUr: "سیف اللہ", nameEn: "Saif Ullah", parent: "2.1.3.4.1.4", gen: 7 },
+  { id: "2.1.3.4.1.4.3", nameUr: "اسد اللہ", nameEn: "Asad Ullah", parent: "2.1.3.4.1.4", gen: 7 },
+  { id: "2.1.3.4.1.4.1.1", nameUr: "وقاص", nameEn: "Waqas", parent: "2.1.3.4.1.4.1", gen: 8 },
+  { id: "2.1.3.4.1.4.1.2", nameUr: "عبید اللہ", nameEn: "Ubaid Ullah", parent: "2.1.3.4.1.4.1", gen: 8 },
+  { id: "2.1.3.4.1.4.2.1", nameUr: "احمد مقید", nameEn: "Ahmad Mugheed", parent: "2.1.3.4.1.4.2", gen: 8 },
+  { id: "2.1.3.4.1.4.2.2", nameUr: "احمد مقیت", nameEn: "Ahmad Muqeet", parent: "2.1.3.4.1.4.2", gen: 8 },
+  { id: "2.1.3.4.1.4.2.3", nameUr: "احمد عدیل", nameEn: "Ahmad Adeel", parent: "2.1.3.4.1.4.2", gen: 8 },
+  { id: "2.1.3.4.1.4.3.1", nameUr: "عبداللہ فرید", nameEn: "Abdullah Farid", parent: "2.1.3.4.1.4.3", gen: 8 },
+
+  { id: "2.1.3.4.1.5.1", nameUr: "محمد اسلم", nameEn: "Muhammad Aslam", parent: "2.1.3.4.1.5", gen: 7 },
+  { id: "2.1.3.4.1.5.2", nameUr: "محمد شاہد", nameEn: "Muhammad Shahid", parent: "2.1.3.4.1.5", gen: 7 },
+  { id: "2.1.3.4.1.5.3", nameUr: "محمد جاوید", nameEn: "Muhammad Javed", parent: "2.1.3.4.1.5", gen: 7 },
+  // ══════════════════════════════════════════════════════════════
+  // 3RD SON LINEAGE — Aezad Bakhsh (ایزد بخش) — id prefix "3"
+  // ══════════════════════════════════════════════════════════════
+  { id: "3.1", nameUr: "غلام محمد", nameEn: "Ghulam Muhammad", parent: "3", gen: 2 },
+  { id: "3.1.1", nameUr: "نور احمد", nameEn: "Noor Ahmad", parent: "3.1", gen: 3 },
+  { id: "3.1.1.1", nameUr: "فیروز دین", nameEn: "Feroze Din", parent: "3.1.1", gen: 4 },
+  { id: "3.1.1.1.1", nameUr: "محمد انور", nameEn: "Muhammad Anwar", parent: "3.1.1.1", gen: 5 },
+  { id: "3.1.1.1.2", nameUr: "محمد اسحاق", nameEn: "Muhammad Ishaq", parent: "3.1.1.1", gen: 5 },
+  { id: "3.1.1.1.2.1", nameUr: "محمد شوکت", nameEn: "Muhammad Shaukat", parent: "3.1.1.1.2", gen: 6 },
+  { id: "3.1.1.1.3", nameUr: "محمد اکرم", nameEn: "Muhammad Akram", parent: "3.1.1.1", gen: 5 },
+  { id: "3.1.1.1.3.1", nameUr: "محمد اکبر", nameEn: "Muhammad Akbar", parent: "3.1.1.1.3", gen: 6 },
+  { id: "3.1.1.1.4", nameUr: "محمد افضل", nameEn: "Muhammad Afzal", parent: "3.1.1.1", gen: 5 },
+  { id: "3.1.1.1.5", nameUr: "عبد الرشید", nameEn: "Abdul Rashid", parent: "3.1.1.1", gen: 5 },
+  { id: "3.1.1.1.5.1", nameUr: "عبد المجید", nameEn: "Abdul Majeed", parent: "3.1.1.1.5", gen: 6 },
+  { id: "3.1.1.1.5.1.1", nameUr: "عبد اللطیف", nameEn: "Abdul Lateef", parent: "3.1.1.1.5.1", gen: 7 },
+  { id: "3.1.1.1.5.1.2", nameUr: "عبد وحید", nameEn: "Abdul Waheed", parent: "3.1.1.1.5.1", gen: 7 },
+  { id: "3.1.1.1.5.1.2.1", nameUr: "فلاق شیر", nameEn: "Falaq Sher", parent: "3.1.1.1.5.1.2", gen: 8 },
+  { id: "3.1.1.1.5.1.3", nameUr: "محمد کاظم", nameEn: "Muhammad Kazim", parent: "3.1.1.1.5.1", gen: 7 },
+  { id: "3.1.1.1.5.1.3.1", nameUr: "گوہر جمال", nameEn: "Gohar Jamal", parent: "3.1.1.1.5.1.3", gen: 8 },
+  { id: "3.1.1.1.5.2", nameUr: "مظفر حسین", nameEn: "Muzaffar Hussain", parent: "3.1.1.1.5", gen: 6 },
+  { id: "3.1.1.1.5.2.1", nameUr: "اظہار الحق", nameEn: "Izhar ul Haq", parent: "3.1.1.1.5.2", gen: 7 },
+  { id: "3.1.1.1.5.2.2", nameUr: "انور الحق", nameEn: "Anwar ul Haq", parent: "3.1.1.1.5.2", gen: 7 },
+  { id: "3.1.1.1.5.2.3", nameUr: "ولی اللہ", nameEn: "Wali Allah", parent: "3.1.1.1.5.2", gen: 7 },
+  { id: "3.1.1.1.6", nameUr: "احمد حسین", nameEn: "Ahmad Hussain", parent: "3.1.1.1", gen: 5 },
+  { id: "3.1.1.1.6.1", nameUr: "فرزند حسین", nameEn: "Farzand Hussain", parent: "3.1.1.1.6", gen: 6 },
+  { id: "3.1.1.1.6.1.1", nameUr: "عبد الرؤف", nameEn: "Abdul Rauf", parent: "3.1.1.1.6.1", gen: 7 },
+  { id: "3.1.1.1.6.1.1.1", nameUr: "عارف", nameEn: "Arif", parent: "3.1.1.1.6.1.1", gen: 8 },
+  { id: "3.1.1.1.6.1.1.2", nameUr: "آصف", nameEn: "Asaf", parent: "3.1.1.1.6.1.1", gen: 8 },
+  { id: "3.1.1.1.6.1.2", nameUr: "فرحت حسین", nameEn: "Farhat Hussain", parent: "3.1.1.1.6.1", gen: 7 },
+  { id: "3.1.1.1.6.1.3", nameUr: "صابر حسین", nameEn: "Sabir Hussain", parent: "3.1.1.1.6.1", gen: 7 },
+  { id: "3.1.1.2", nameUr: "علی اکبر", nameEn: "Ali Akbar", parent: "3.1.1", gen: 4 },
+  { id: "3.1.1.3", nameUr: "دوست علی", nameEn: "Dost Ali", parent: "3.1.1", gen: 4 },
+  { id: "3.1.1.3.1", nameUr: "محمد حسین", nameEn: "Muhammad Hussain", parent: "3.1.1.3", gen: 5 },
+  { id: "3.1.1.3.2", nameUr: "فتح حسین", nameEn: "Fath Hussain", parent: "3.1.1.3", gen: 5 },
+  { id: "3.1.1.3.2.1", nameUr: "تفضل حسین", nameEn: "Tafazzul Hussain", parent: "3.1.1.3.2", gen: 6 },
+  { id: "3.1.1.3.2.1.1", nameUr: "تجمل حسین", nameEn: "Tajmal Hussain", parent: "3.1.1.3.2.1", gen: 7 },
+  { id: "3.1.1.3.2.1.1.1", nameUr: "کامران تجمل", nameEn: "Kamran Tajmal", parent: "3.1.1.3.2.1.1", gen: 8 },
+  { id: "3.1.1.3.2.1.1.1.1", nameUr: "محمد حسن کاشان", nameEn: "Muhammad Hassan Kashan", parent: "3.1.1.3.2.1.1.1", gen: 9 },
+  { id: "3.1.1.3.2.1.1.2", nameUr: "عمران تجمل", nameEn: "Imran Tajmal", parent: "3.1.1.3.2.1.1", gen: 8 },
+  { id: "3.1.1.3.2.1.1.2.1", nameUr: "خضر تجمل", nameEn: "Khizr Tajmal", parent: "3.1.1.3.2.1.1.2", gen: 9 },
+  { id: "3.1.1.3.2.1.2", nameUr: "الطاف گوہر", nameEn: "Altaf Gowhar", parent: "3.1.1.3.2.1", gen: 7 },
+  { id: "3.1.1.3.2.1.2.1", nameUr: "ہمایوں گوہر", nameEn: "Humayun Gowhar", parent: "3.1.1.3.2.1.2", gen: 8 },
+  { id: "3.1.1.3.2.1.2.1.1", nameUr: "محمد علی گوہر", nameEn: "Muhammad Ali Gowhar", parent: "3.1.1.3.2.1.2.1", gen: 9 },
+  { id: "3.1.1.3.2.2", nameUr: "مظفر حسین", nameEn: "Muzaffar Hussain", parent: "3.1.1.3.2", gen: 6 },
+  { id: "3.1.1.3.2.2.1", nameUr: "تصدیق حسین", nameEn: "Tasaduq Hussain", parent: "3.1.1.3.2.2", gen: 7 },
+  { id: "3.1.1.3.2.2.2", nameUr: "منور حسین", nameEn: "Munawwar Hussain", parent: "3.1.1.3.2.2", gen: 7 },
+  { id: "3.1.1.3.2.3", nameUr: "محمد عبداللہ", nameEn: "Muhammad Abdullah", parent: "3.1.1.3.2", gen: 6 },
+  { id: "3.1.2", nameUr: "شیخ احمد", nameEn: "Sheikh Ahmad", parent: "3.1", gen: 3 },
+  { id: "3.2", nameUr: "قطب الدین", nameEn: "Qutb ud Din", parent: "3", gen: 2 },
+  { id: "3.2.1", nameUr: "نور محمد", nameEn: "Noor Muhammad", parent: "3.2", gen: 3 },
+  { id: "3.2.1.1", nameUr: "محبوب عالم", nameEn: "Mahboob Alam", parent: "3.2.1", gen: 4 },
+  { id: "3.2.1.1.1", nameUr: "نذیر احمد خان", nameEn: "Nazir Ahmad Khan", parent: "3.2.1.1", gen: 5 },
+  { id: "3.2.1.1.1.1", nameUr: "شمیم احمد خان", nameEn: "Shameem Ahmad Khan", parent: "3.2.1.1.1", gen: 6 },
+  { id: "3.2.1.1.1.1.1", nameUr: "زاہد شمیم", nameEn: "Zahid Shameem", parent: "3.2.1.1.1.1", gen: 7 },
+  { id: "3.2.1.1.1.1.2", nameUr: "مجاہد شمیم", nameEn: "Mujahid Shameem", parent: "3.2.1.1.1.1", gen: 7 },
+  { id: "3.2.1.1.1.2", nameUr: "نسیم احمد خان", nameEn: "Naseem Ahmad Khan", parent: "3.2.1.1.1", gen: 6 },
+  { id: "3.2.1.1.1.3", nameUr: "سعید احمد خان", nameEn: "Saeed Ahmad Khan", parent: "3.2.1.1.1", gen: 6 },
+  { id: "3.2.1.1.2", nameUr: "بشیر احمد خان", nameEn: "Bashir Ahmad Khan", parent: "3.2.1.1", gen: 5 },
+  { id: "3.2.1.1.2.1", nameUr: "محمد صفدر خان", nameEn: "Muhammad Safdar Khan", parent: "3.2.1.1.2", gen: 6 },
+  { id: "3.2.1.1.2.1.1", nameUr: "عمر فاروق", nameEn: "Umer Farooq", parent: "3.2.1.1.2.1", gen: 7 },
+  { id: "3.2.1.1.2.1.2", nameUr: "ہارون بشیر", nameEn: "Haroon Bashir", parent: "3.2.1.1.2.1", gen: 7 },
+  { id: "3.2.1.1.2.1.2.1", nameUr: "سریز", nameEn: "Sareez", parent: "3.2.1.1.2.1.2", gen: 8 },
+  { id: "3.2.1.1.2.2", nameUr: "محمد افضل خان", nameEn: "Muhammad Afzal Khan", parent: "3.2.1.1.2", gen: 6 },
+  { id: "3.2.1.1.2.2.1", nameUr: "طارق بشیر", nameEn: "Tariq Bashir", parent: "3.2.1.1.2.2", gen: 7 },
+  { id: "3.2.1.1.2.2.2", nameUr: "ہمایوں بشیر", nameEn: "Humayun Bashir", parent: "3.2.1.1.2.2", gen: 7 },
+  { id: "3.2.1.1.3", nameUr: "ظفر حسین خان", nameEn: "Zafar Hussain Khan", parent: "3.2.1.1", gen: 5 },
+  { id: "3.2.1.1.3.1", nameUr: "ممتاز ظفر", nameEn: "Mumtaz Zafar", parent: "3.2.1.1.3", gen: 6 },
+  { id: "3.2.1.1.3.1.1", nameUr: "مجاہد ظفر", nameEn: "Mujahid Zafar", parent: "3.2.1.1.3.1", gen: 7 },
+  { id: "3.2.1.1.3.2", nameUr: "مسعود ظفر", nameEn: "Masood Zafar", parent: "3.2.1.1.3", gen: 6 },
+  { id: "3.2.1.1.3.2.1", nameUr: "سالار", nameEn: "Salar", parent: "3.2.1.1.3.2", gen: 7 },
+  { id: "3.2.1.1.4", nameUr: "عنایت اللہ خان", nameEn: "Inayat Ullah Khan", parent: "3.2.1.1", gen: 5 },
+  { id: "3.2.1.1.4.1", nameUr: "محمود انور", nameEn: "Mahmood Anwar", parent: "3.2.1.1.4", gen: 6 },
+  { id: "3.2.1.1.4.1.1", nameUr: "خالد محمود", nameEn: "Khalid Mahmood", parent: "3.2.1.1.4.1", gen: 7 },
+  { id: "3.2.1.1.4.1.2", nameUr: "شاہد محمود", nameEn: "Shahid Mahmood", parent: "3.2.1.1.4.1", gen: 7 },
+  { id: "3.2.1.1.4.2", nameUr: "محمد اکبر", nameEn: "Muhammad Akbar", parent: "3.2.1.1.4", gen: 6 },
+  { id: "3.2.1.2", nameUr: "نظام الدین", nameEn: "Nizam ud Din", parent: "3.2.1", gen: 4 },
+  { id: "3.2.1.2.1", nameUr: "محمد اسلم", nameEn: "Muhammad Aslam", parent: "3.2.1.2", gen: 5 },
+  { id: "3.2.1.2.1.1", nameUr: "نعیم الدین", nameEn: "Naeem ud Din", parent: "3.2.1.2.1", gen: 6 },
+  { id: "3.2.1.2.1.2", nameUr: "احسن الدین", nameEn: "Ahsan ud Din", parent: "3.2.1.2.1", gen: 6 },
+  { id: "3.2.1.2.1.2.1", nameUr: "ابراہیم", nameEn: "Ibrahim", parent: "3.2.1.2.1.2", gen: 7 },
+  { id: "3.2.1.2.1.3", nameUr: "ناصر الدین", nameEn: "Nasir ud Din", parent: "3.2.1.2.1", gen: 6 },
+  { id: "3.2.1.2.1.3.1", nameUr: "شعیب", nameEn: "Shuaib", parent: "3.2.1.2.1.3", gen: 7 },
+  { id: "3.2.1.2.1.3.2", nameUr: "اویس", nameEn: "Awais", parent: "3.2.1.2.1.3", gen: 7 },
+  { id: "3.2.1.2.1.3.3", nameUr: "انتظام", nameEn: "Intizam", parent: "3.2.1.2.1.3", gen: 7 },
+  { id: "3.2.1.2.1.3.4", nameUr: "عمر", nameEn: "Umar", parent: "3.2.1.2.1.3", gen: 7 },
+  { id: "3.2.1.2.1.4", nameUr: "معین الدین", nameEn: "Mueen ud Din", parent: "3.2.1.2.1", gen: 6 },
+  { id: "3.2.1.2.1.4.1", nameUr: "علی", nameEn: "Ali", parent: "3.2.1.2.1.4", gen: 7 },
+  { id: "3.2.1.2.2", nameUr: "محمد اکرم", nameEn: "Muhammad Akram", parent: "3.2.1.2", gen: 5 },
+  { id: "3.2.1.2.2.1", nameUr: "انعام اللہ", nameEn: "Inaam Ullah", parent: "3.2.1.2.2", gen: 6 },
+  { id: "3.2.1.2.2.2", nameUr: "سبقت اللہ", nameEn: "Sibghat Ullah", parent: "3.2.1.2.2", gen: 6 },
+  { id: "3.2.1.2.2.2.1", nameUr: "عبد المجید", nameEn: "Abdul Majid", parent: "3.2.1.2.2.2", gen: 7 },
+  { id: "3.2.1.2.2.2.2", nameUr: "عبد سمیع", nameEn: "Abdul Samee", parent: "3.2.1.2.2.2", gen: 7 },
+  { id: "3.2.1.2.2.3", nameUr: "ارشاد اللہ", nameEn: "Irshad Ullah", parent: "3.2.1.2.2", gen: 6 },
+  { id: "3.2.1.2.2.3.1", nameUr: "عبد المقیط", nameEn: "Abdul Muqeet", parent: "3.2.1.2.2.3", gen: 7 },
+  { id: "3.2.1.2.2.3.2", nameUr: "عبد الودود", nameEn: "Abdul Wadood", parent: "3.2.1.2.2.3", gen: 7 },
+  { id: "3.2.1.2.2.4", nameUr: "احسان اللہ", nameEn: "Ahsan Ullah", parent: "3.2.1.2.2", gen: 6 },
+  { id: "3.2.1.2.2.4.1", nameUr: "حمزہ اکرم", nameEn: "Hamza Akram", parent: "3.2.1.2.2.4", gen: 7 },
+  { id: "3.2.1.2.2.4.2", nameUr: "بلال اکرم", nameEn: "Bilal Akram", parent: "3.2.1.2.2.4", gen: 7 },
+  { id: "3.2.1.2.2.5", nameUr: "امان اللہ", nameEn: "Aman Ullah", parent: "3.2.1.2.2", gen: 6 },
+  { id: "3.2.1.2.2.5.1", nameUr: "علی", nameEn: "Ali", parent: "3.2.1.2.2.5", gen: 7 },
+  { id: "3.2.1.2.2.6", nameUr: "اسد اللہ", nameEn: "Asad Ullah", parent: "3.2.1.2.2", gen: 6 },
+  { id: "3.2.1.2.2.6.1", nameUr: "عمر", nameEn: "Umar", parent: "3.2.1.2.2.6", gen: 7 },
+  { id: "3.2.1.2.2.6.2", nameUr: "زبیر", nameEn: "Zubair", parent: "3.2.1.2.2.6", gen: 7 },
+  { id: "3.2.2", nameUr: "شیر محمد", nameEn: "Sher Muhammad", parent: "3.2", gen: 3 },
+  { id: "3.2.2.1", nameUr: "محمد حسین", nameEn: "Muhammad Hussain", parent: "3.2.2", gen: 4 },
+  { id: "3.2.2.1.1", nameUr: "سردار خان", nameEn: "Sardar Khan", parent: "3.2.2.1", gen: 5 },
+  { id: "3.2.2.1.1.1", nameUr: "عطاء اللہ", nameEn: "Ataullah", parent: "3.2.2.1.1", gen: 6 },
+  { id: "3.2.2.1.2", nameUr: "نصراللہ خان", nameEn: "Nasrullah Khan", parent: "3.2.2.1", gen: 5 },
+  { id: "3.2.2.1.2.1", nameUr: "ہمایوں ظفر", nameEn: "Humayun Zafar", parent: "3.2.2.1.2", gen: 6 },
+  { id: "3.2.2.1.2.1.1", nameUr: "حسن نصراللہ", nameEn: "Hassan Nasrullah", parent: "3.2.2.1.2.1", gen: 7 },
+  { id: "3.2.2.1.2.1.1.1", nameUr: "حمزہ ہمایوں", nameEn: "Hamza Humayun", parent: "3.2.2.1.2.1.1", gen: 8 },
+  { id: "3.2.2.1.2.1.2", nameUr: "سعد نصراللہ", nameEn: "Saad Nasrullah", parent: "3.2.2.1.2.1", gen: 7 },
+  { id: "3.2.2.1.2.1.2.1", nameUr: "احمد ہمایوں", nameEn: "Ahmad Humayun", parent: "3.2.2.1.2.1.2", gen: 8 },
+  { id: "3.2.2.1.2.1.3", nameUr: "عمر نصراللہ", nameEn: "Umer Nasrullah", parent: "3.2.2.1.2.1", gen: 7 },
+  { id: "3.2.2.1.2.1.4", nameUr: "محسن نصراللہ", nameEn: "Mohsin Nasrullah", parent: "3.2.2.1.2.1", gen: 7 },
+  { id: "3.2.2.1.2.1.4.1", nameUr: "ہمایوں محسن", nameEn: "Humayun Mohsin", parent: "3.2.2.1.2.1.4", gen: 8 },
+  { id: "3.2.2.1.2.2", nameUr: "محمد نواز خالد", nameEn: "Muhammad Nawaz Khalid", parent: "3.2.2.1.2", gen: 6 },
+  { id: "3.2.2.1.2.2.1", nameUr: "امیر شعیب", nameEn: "Amir Shuaib", parent: "3.2.2.1.2.2", gen: 7 },
+  { id: "3.2.2.1.2.3", nameUr: "سلیم اللہ", nameEn: "Saleem Ullah", parent: "3.2.2.1.2", gen: 6 },
+  { id: "3.2.2.1.2.3.1", nameUr: "ضیاء الدین", nameEn: "Zia ud Din", parent: "3.2.2.1.2.3", gen: 7 },
+  { id: "3.2.2.1.2.3.1.1", nameUr: "ارتضیٰ حسین", nameEn: "Irtaza Hussain", parent: "3.2.2.1.2.3.1", gen: 8 },
+  { id: "3.2.2.1.2.3.1.2", nameUr: "عزیر ضیاء", nameEn: "Uzair Zia", parent: "3.2.2.1.2.3.1", gen: 8 },
+  { id: "3.2.2.1.2.3.1.3", nameUr: "ابو بکر", nameEn: "Abu Bakar", parent: "3.2.2.1.2.3.1", gen: 8 },
+  { id: "3.2.2.1.3", nameUr: "برکت علی", nameEn: "Barkat Ali", parent: "3.2.2.1", gen: 5 },
+  { id: "3.2.2.1.4", nameUr: "محمد عبداللہ", nameEn: "Muhammad Abdullah", parent: "3.2.2.1", gen: 5 },
+  { id: "3.2.2.2", nameUr: "احمد دین", nameEn: "Ahmad Din", parent: "3.2.2", gen: 4 },
+  { id: "3.2.2.2.1", nameUr: "فیروز بخت", nameEn: "Feroze Bakht", parent: "3.2.2.2", gen: 5 },
+  { id: "3.2.2.2.1.1", nameUr: "اللہ داد خان", nameEn: "Allah Dad Khan", parent: "3.2.2.2.1", gen: 6 },
+  { id: "3.2.2.2.1.2", nameUr: "خدا داد خان", nameEn: "Khuda Dad Khan", parent: "3.2.2.2.1", gen: 6 },
+  { id: "3.3", nameUr: "شرف الدین", nameEn: "Sharf ud Din", parent: "3", gen: 2 },
+  { id: "3.3.1", nameUr: "غلام رسول", nameEn: "Ghulam Rasool", parent: "3.3", gen: 3 },
+  { id: "3.3.1.1", nameUr: "کرم الٰہی", nameEn: "Karam Ilahi", parent: "3.3.1", gen: 4 },
+  { id: "3.3.1.1.1", nameUr: "محمد سعید", nameEn: "Muhammad Saeed", parent: "3.3.1.1", gen: 5 },
+  { id: "3.3.1.1.1.1", nameUr: "اختر پرویز", nameEn: "Akhtar Parvez", parent: "3.3.1.1.1", gen: 6 },
+  { id: "3.3.1.1.1.1.1", nameUr: "محمد فہد", nameEn: "Muhammad Fahad", parent: "3.3.1.1.1.1", gen: 7 },
+  { id: "3.3.1.1.1.1.2", nameUr: "انس", nameEn: "Anas", parent: "3.3.1.1.1.1", gen: 7 },
+  { id: "3.3.1.1.1.2", nameUr: "اسلم پرویز", nameEn: "Aslam Parvez", parent: "3.3.1.1.1", gen: 6 },
+  { id: "3.3.1.1.1.3", nameUr: "شاہد پرویز", nameEn: "Shahid Parvez", parent: "3.3.1.1.1", gen: 6 },
+  { id: "3.3.1.1.1.3.1", nameUr: "شاہروز", nameEn: "Shahroz", parent: "3.3.1.1.1.3", gen: 7 },
+  { id: "3.3.1.1.1.4", nameUr: "حامد لطیف", nameEn: "Hamid Latif", parent: "3.3.1.1.1", gen: 6 },
+  { id: "3.3.1.1.1.4.1", nameUr: "امیر", nameEn: "Amir", parent: "3.3.1.1.1.4", gen: 7 },
+  { id: "3.3.1.1.1.4.2", nameUr: "عادل", nameEn: "Adil", parent: "3.3.1.1.1.4", gen: 7 },
+  { id: "3.3.1.1.1.4.3", nameUr: "اویس", nameEn: "Awais", parent: "3.3.1.1.1.4", gen: 7 },
+  { id: "3.3.1.1.1.5", nameUr: "خالد لطیف", nameEn: "Khalid Latif", parent: "3.3.1.1.1", gen: 6 },
+  { id: "3.3.1.1.1.5.1", nameUr: "سہیل خالد", nameEn: "Suhail Khalid", parent: "3.3.1.1.1.5", gen: 7 },
+  { id: "3.3.1.1.1.5.2", nameUr: "راحیل خالد", nameEn: "Raheel Khalid", parent: "3.3.1.1.1.5", gen: 7 },
+  { id: "3.3.1.1.2", nameUr: "محمد صدیق", nameEn: "Muhammad Siddique", parent: "3.3.1.1", gen: 5 },
+  { id: "3.3.1.1.3", nameUr: "نذیر حسین", nameEn: "Nazir Hussain", parent: "3.3.1.1", gen: 5 },
+  { id: "3.3.1.1.3.1", nameUr: "انور جاوید", nameEn: "Anwar Javed", parent: "3.3.1.1.3", gen: 6 },
+  { id: "3.3.1.1.3.1.1", nameUr: "اظہر جاوید", nameEn: "Azhar Javed", parent: "3.3.1.1.3.1", gen: 7 },
+  { id: "3.3.1.1.3.1.2", nameUr: "اطہر جاوید", nameEn: "Athar Javed", parent: "3.3.1.1.3.1", gen: 7 },
+  { id: "3.3.1.1.3.1.3", nameUr: "اشعر جاوید", nameEn: "Asher Javed", parent: "3.3.1.1.3.1", gen: 7 },
+  { id: "3.3.1.1.3.1.4", nameUr: "عامر جاوید", nameEn: "Aamir Javed", parent: "3.3.1.1.3.1", gen: 7 },
+  { id: "3.3.1.2", nameUr: "نور احمد", nameEn: "Noor Ahmad", parent: "3.3.1", gen: 4 },
+  { id: "3.3.1.2.1", nameUr: "غلام حیدر", nameEn: "Ghulam Haider", parent: "3.3.1.2", gen: 5 },
+  { id: "3.3.1.2.1.1", nameUr: "محمد صفدر", nameEn: "Muhammad Safdar", parent: "3.3.1.2.1", gen: 6 },
+  { id: "3.3.1.2.1.2", nameUr: "محمد افضل", nameEn: "Muhammad Afzal", parent: "3.3.1.2.1", gen: 6 },
+  { id: "3.3.1.2.1.3", nameUr: "محمد اختر", nameEn: "Muhammad Akhtar", parent: "3.3.1.2.1", gen: 6 },
+  { id: "3.3.1.2.1.3.1", nameUr: "نعیم اختر", nameEn: "Naeem Akhtar", parent: "3.3.1.2.1.3", gen: 7 },
+  { id: "3.3.1.3", nameUr: "امیر الدین", nameEn: "Amir ud Din", parent: "3.3.1", gen: 4 },
+  { id: "3.3.1.3.1", nameUr: "شہاب الدین", nameEn: "Shahab ud Din", parent: "3.3.1.3", gen: 5 },
+  { id: "3.3.1.3.1.1", nameUr: "بشیر قمر", nameEn: "Bashir Qamar", parent: "3.3.1.3.1", gen: 6 },
+  { id: "3.3.1.3.1.1.1", nameUr: "بدر قمر", nameEn: "Badr Qamar", parent: "3.3.1.3.1.1", gen: 7 },
+  { id: "3.3.1.3.1.1.2", nameUr: "ثاقب قمر", nameEn: "Saqib Qamar", parent: "3.3.1.3.1.1", gen: 7 },
+  { id: "3.3.1.3.1.1.3", nameUr: "کوکب قمر", nameEn: "Kokab Qamar", parent: "3.3.1.3.1.1", gen: 7 },
+  { id: "3.3.1.3.1.1.3.1", nameUr: "سعد کوکب", nameEn: "Saad Kokab", parent: "3.3.1.3.1.1.3", gen: 8 },
+  { id: "3.3.1.3.1.1.4", nameUr: "امجد قمر", nameEn: "Amjad Qamar", parent: "3.3.1.3.1.1", gen: 7 },
+  { id: "3.3.1.3.1.1.4.1", nameUr: "سعد", nameEn: "Saad", parent: "3.3.1.3.1.1.4", gen: 8 },
+  { id: "3.3.1.3.1.1.4.2", nameUr: "فہد", nameEn: "Fahad", parent: "3.3.1.3.1.1.4", gen: 8 },
+  { id: "3.3.1.3.1.1.5", nameUr: "نجم قمر", nameEn: "Najam Qamar", parent: "3.3.1.3.1.1", gen: 7 },
+  { id: "3.3.1.3.1.1.5.1", nameUr: "احتشام", nameEn: "Ehtisham", parent: "3.3.1.3.1.1.5", gen: 8 },
+  { id: "3.3.1.3.1.2", nameUr: "شمس الدین", nameEn: "Shams ud Din", parent: "3.3.1.3.1", gen: 6 },
+  { id: "3.3.1.3.1.2.1", nameUr: "کلیم اختر", nameEn: "Kaleem Akhtar", parent: "3.3.1.3.1.2", gen: 7 },
+  { id: "3.3.1.3.1.2.2", nameUr: "نعیم اختر", nameEn: "Naeem Akhtar", parent: "3.3.1.3.1.2", gen: 7 },
+  { id: "3.3.1.3.1.2.3", nameUr: "جمیل اختر", nameEn: "Jameel Akhtar", parent: "3.3.1.3.1.2", gen: 7 },
+  { id: "3.3.1.3.2", nameUr: "امام الدین", nameEn: "Imam ud Din", parent: "3.3.1.3", gen: 5 },
+  { id: "3.3.1.3.2.1", nameUr: "رحمت اللہ", nameEn: "Rehmat Ullah", parent: "3.3.1.3.2", gen: 6 },
+  { id: "3.3.1.3.2.1.1", nameUr: "پرویز احمد", nameEn: "Pervaiz Ahmad", parent: "3.3.1.3.2.1", gen: 7 },
+  { id: "3.3.1.3.2.1.1.1", nameUr: "عبداللہ", nameEn: "Abdullah", parent: "3.3.1.3.2.1.1", gen: 8 },
+  { id: "3.3.1.3.2.1.1.2", nameUr: "بلال", nameEn: "Bilal", parent: "3.3.1.3.2.1.1", gen: 8 },
+  { id: "3.3.1.3.2.1.2", nameUr: "واحد احمد", nameEn: "Wahid Ahmad", parent: "3.3.1.3.2.1", gen: 7 },
+  { id: "3.3.1.3.2.1.3", nameUr: "شاہد احمد", nameEn: "Shahid Ahmad", parent: "3.3.1.3.2.1", gen: 7 },
+  { id: "3.3.1.3.2.1.3.1", nameUr: "تیمور", nameEn: "Taimoor", parent: "3.3.1.3.2.1.3", gen: 8 },
+  { id: "3.3.1.3.2.2", nameUr: "نذیر احمد", nameEn: "Nazir Ahmad", parent: "3.3.1.3.2", gen: 6 },
+  { id: "3.3.1.3.2.3", nameUr: "غلام مصطفی", nameEn: "Ghulam Mustafa", parent: "3.3.1.3.2", gen: 6 },
+  { id: "3.3.1.3.2.3.1", nameUr: "عبد الرشید", nameEn: "Abdul Rashid", parent: "3.3.1.3.2.3", gen: 7 },
+  { id: "3.3.1.3.2.3.1.1", nameUr: "محمد سعید", nameEn: "Muhammad Saeed", parent: "3.3.1.3.2.3.1", gen: 8 },
+  { id: "3.3.1.3.2.3.1.1.1", nameUr: "ارش", nameEn: "Arish", parent: "3.3.1.3.2.3.1.1", gen: 9 },
+  { id: "3.3.1.3.2.3.1.2", nameUr: "محمد علی", nameEn: "Muhammad Ali", parent: "3.3.1.3.2.3.1", gen: 8 },
+  { id: "3.3.1.3.2.3.1.3", nameUr: "محمد رضا", nameEn: "Muhammad Raza", parent: "3.3.1.3.2.3.1", gen: 8 },
+  { id: "3.3.1.3.2.3.1.3.1", nameUr: "واحد", nameEn: "Wahid", parent: "3.3.1.3.2.3.1.3", gen: 9 },
+  { id: "3.3.1.3.2.3.1.4", nameUr: "منصور", nameEn: "Mansoor", parent: "3.3.1.3.2.3.1", gen: 8 },
+  { id: "3.3.1.3.3", nameUr: "غلام قادر", nameEn: "Ghulam Qadir", parent: "3.3.1.3", gen: 5 },
+  { id: "3.3.1.3.3.1", nameUr: "حبیب اللہ", nameEn: "Habib Ullah", parent: "3.3.1.3.3", gen: 6 },
+  { id: "3.3.1.3.3.1.1", nameUr: "اکرام اللہ", nameEn: "Akram Ullah", parent: "3.3.1.3.3.1", gen: 7 },
+  { id: "3.3.1.3.3.1.1.1", nameUr: "طاہر اکرم", nameEn: "Tahir Akram", parent: "3.3.1.3.3.1.1", gen: 8 },
+  { id: "3.3.1.3.3.1.2", nameUr: "امان اللہ", nameEn: "Aman Ullah", parent: "3.3.1.3.3.1", gen: 7 },
+  { id: "3.3.1.3.3.1.2.1", nameUr: "عثمان امان", nameEn: "Usman Aman", parent: "3.3.1.3.3.1.2", gen: 8 },
+  { id: "3.3.1.3.3.1.2.2", nameUr: "عدنان امان", nameEn: "Adnan Aman", parent: "3.3.1.3.3.1.2", gen: 8 },
+  { id: "3.3.1.3.3.1.3", nameUr: "احسان اللہ", nameEn: "Ahsan Ullah", parent: "3.3.1.3.3.1", gen: 7 },
+  { id: "3.3.1.3.3.1.3.1", nameUr: "زاہد احسان", nameEn: "Zahid Ehsan", parent: "3.3.1.3.3.1.3", gen: 8 },
+  { id: "3.3.1.3.3.1.3.2", nameUr: "عابد احسان", nameEn: "Abid Ehsan", parent: "3.3.1.3.3.1.3", gen: 8 },
+  { id: "3.3.1.3.3.1.3.3", nameUr: "مجید احسان", nameEn: "Majid Ehsan", parent: "3.3.1.3.3.1.3", gen: 8 },
+  { id: "3.3.1.3.3.1.3.4", nameUr: "ساجد احسان", nameEn: "Sajid Ehsan", parent: "3.3.1.3.3.1.3", gen: 8 },
+  { id: "3.3.1.3.3.1.4", nameUr: "ظفر اللہ", nameEn: "Zafar Ullah", parent: "3.3.1.3.3.1", gen: 7 },
+  { id: "3.3.1.3.3.1.4.1", nameUr: "شکیل احمد", nameEn: "Shakeel Ahmad", parent: "3.3.1.3.3.1.4", gen: 8 },
+  { id: "3.3.1.3.3.1.4.2", nameUr: "شاہ نواز احمد", nameEn: "Shah Nawaz Ahmad", parent: "3.3.1.3.3.1.4", gen: 8 },
+  { id: "3.3.1.3.3.1.4.3", nameUr: "شیراز احمد", nameEn: "Sheraz Ahmad", parent: "3.3.1.3.3.1.4", gen: 8 },
+  { id: "3.3.1.3.3.1.4.4", nameUr: "شہباز احمد", nameEn: "Shehbaz Ahmad", parent: "3.3.1.3.3.1.4", gen: 8 },
+  { id: "3.3.1.3.3.1.4.5", nameUr: "شہزاد احمد", nameEn: "Shehzad Ahmad", parent: "3.3.1.3.3.1.4", gen: 8 },
+  { id: "3.3.1.3.3.1.5", nameUr: "نصار اللہ", nameEn: "Nasar Ullah", parent: "3.3.1.3.3.1", gen: 7 },
+  { id: "3.3.1.3.3.1.5.1", nameUr: "عزیز احمد", nameEn: "Aziz Ahmad", parent: "3.3.1.3.3.1.5", gen: 8 },
+  { id: "3.3.1.3.3.1.5.2", nameUr: "عتیق احمد", nameEn: "Ateeq Ahmad", parent: "3.3.1.3.3.1.5", gen: 8 },
+  { id: "3.3.1.3.3.1.5.3", nameUr: "خلیل احمد", nameEn: "Khalil Ahmad", parent: "3.3.1.3.3.1.5", gen: 8 },
+  { id: "3.3.1.3.3.1.5.4", nameUr: "نوید احمد", nameEn: "Naveed Ahmad", parent: "3.3.1.3.3.1.5", gen: 8 },
+  { id: "3.3.1.3.3.1.5.5", nameUr: "عرفان احمد", nameEn: "Irfan Ahmad", parent: "3.3.1.3.3.1.5", gen: 8 },
+  { id: "3.3.1.3.3.2", nameUr: "محمد شفیع", nameEn: "Muhammad Shafi", parent: "3.3.1.3.3", gen: 6 },
+  { id: "3.3.1.3.3.2.1", nameUr: "عبد الواحد", nameEn: "Abdul Wahid", parent: "3.3.1.3.3.2", gen: 7 },
+  { id: "3.3.1.3.3.2.2", nameUr: "احمد شفیق", nameEn: "Ahmad Shafiq", parent: "3.3.1.3.3.2", gen: 7 },
+  { id: "3.3.1.3.3.2.2.1", nameUr: "ڈاکٹر عبد الخالق", nameEn: "Dr. Abdul Khaliq", parent: "3.3.1.3.3.2.2", gen: 8 },
+  { id: "3.3.2", nameUr: "نور حسین", nameEn: "Noor Hussain", parent: "3.3", gen: 3 },
+  { id: "3.3.2.1", nameUr: "سراج الدین", nameEn: "Sirajuddin", parent: "3.3.2", gen: 4 },
+  { id: "3.3.2.2", nameUr: "بدھا", nameEn: "Budha", parent: "3.3.2", gen: 4 },
+  { id: "3.3.2.3", nameUr: "کرم علی", nameEn: "Karam Ali", parent: "3.3.2", gen: 4 },
+  { id: "3.3.2.3.1", nameUr: "عبد الرحمن", nameEn: "Abdul Rahman", parent: "3.3.2.3", gen: 5 },
+  { id: "3.3.2.3.1.1", nameUr: "عبد المجید", nameEn: "Abdul Majeed", parent: "3.3.2.3.1", gen: 6 },
+  { id: "3.3.2.3.1.1.1", nameUr: "طارق مجید", nameEn: "Tariq Majeed", parent: "3.3.2.3.1.1", gen: 7 },
+  { id: "3.3.2.3.1.1.2", nameUr: "پرویز مجید", nameEn: "Pervaiz Majeed", parent: "3.3.2.3.1.1", gen: 7 },
+  { id: "3.3.2.3.1.1.3", nameUr: "ارشاد مجید", nameEn: "Arshad Majeed", parent: "3.3.2.3.1.1", gen: 7 },
+  { id: "3.3.2.3.2", nameUr: "محبوب عالم", nameEn: "Mehboob Alam", parent: "3.3.2.3", gen: 5 },
+  { id: "3.3.2.3.3", nameUr: "فضل الٰہی", nameEn: "Fazal Ilahi", parent: "3.3.2.3", gen: 5 },
+  { id: "3.4", nameUr: "قدم الدین", nameEn: "Qadm ud Din", parent: "3", gen: 2 },
+  { id: "3.4.1", nameUr: "قاسم خان", nameEn: "Qasim Khan", parent: "3.4", gen: 3 },
+  { id: "3.4.1.1", nameUr: "حسن الدین", nameEn: "Hassan ud Din", parent: "3.4.1", gen: 4 },
+  { id: "3.4.1.2", nameUr: "محمد دین", nameEn: "Muhammad Din", parent: "3.4.1", gen: 4 },
+  { id: "3.4.1.3", nameUr: "شیخ احمد", nameEn: "Sheikh Ahmad", parent: "3.4.1", gen: 4 },
+  { id: "3.4.1.3.1", nameUr: "محمد حسین", nameEn: "Muhammad Hussain", parent: "3.4.1.3", gen: 5 },
+  { id: "3.4.2", nameUr: "مشرف خان", nameEn: "Musharraf Khan", parent: "3.4", gen: 3 },
+  { id: "3.4.2.1", nameUr: "فیض احمد خان", nameEn: "Faiz Ahmad Khan", parent: "3.4.2", gen: 4 },
+  { id: "3.4.2.1.1", nameUr: "نذیر احمد خان", nameEn: "Nazeer Ahmad Khan", parent: "3.4.2.1", gen: 5 },
+  { id: "3.4.2.1.1.1", nameUr: "اظہر شور", nameEn: "Azhar Shoor", parent: "3.4.2.1.1", gen: 6 },
+  { id: "3.4.2.1.1.1.1", nameUr: "اکبر", nameEn: "Akbar", parent: "3.4.2.1.1.1", gen: 7 },
+  { id: "3.4.2.1.1.1.2", nameUr: "عنیق", nameEn: "Aneeq", parent: "3.4.2.1.1.1", gen: 7 },
+  { id: "3.4.2.1.1.2", nameUr: "مظہر فاروق", nameEn: "Mazhar Farooq", parent: "3.4.2.1.1", gen: 6 },
+  { id: "3.4.2.1.1.2.1", nameUr: "ڈاکٹر ارشاد مظہر", nameEn: "Dr. Arshad Mazhar", parent: "3.4.2.1.1.2", gen: 7 },
+  { id: "3.4.2.1.1.3", nameUr: "عبید الرحمن", nameEn: "Ubaid ur Rahman", parent: "3.4.2.1.1", gen: 6 },
+  { id: "3.4.2.1.1.4", nameUr: "عامر انیس", nameEn: "Amir Anees", parent: "3.4.2.1.1", gen: 6 },
+  { id: "3.4.2.1.1.4.1", nameUr: "فیضان عامر", nameEn: "Faizan Amir", parent: "3.4.2.1.1.4", gen: 7 },
+  { id: "3.4.2.1.1.4.2", nameUr: "عثمان عامر نذیر", nameEn: "Usman Amir Nazeer", parent: "3.4.2.1.1.4", gen: 7 },
+  { id: "3.4.2.1.1.5", nameUr: "عرفان عادل", nameEn: "Irfan Adil", parent: "3.4.2.1.1", gen: 6 },
+  { id: "3.4.2.1.2", nameUr: "محمد حیات", nameEn: "Muhammad Hayat", parent: "3.4.2.1", gen: 5 },
+  { id: "3.4.2.1.2.1", nameUr: "اشفاق احمد", nameEn: "Ashfaq Ahmad", parent: "3.4.2.1.2", gen: 6 },
+  { id: "3.4.2.1.2.1.1", nameUr: "مظہر کمال", nameEn: "Mazhar Kamal", parent: "3.4.2.1.2.1", gen: 7 },
+  { id: "3.4.2.1.2.1.1.1", nameUr: "زین کمال", nameEn: "Zain Kamal", parent: "3.4.2.1.2.1.1", gen: 8 },
+  { id: "3.4.2.1.2.1.2", nameUr: "اظہر کمال", nameEn: "Azhar Kamal", parent: "3.4.2.1.2.1", gen: 7 },
+  { id: "3.4.2.1.2.1.3", nameUr: "اطہر کمال", nameEn: "Athar Kamal", parent: "3.4.2.1.2.1", gen: 7 },
+  { id: "3.4.2.1.2.1.3.1", nameUr: "سعید کمال", nameEn: "Saeed Kamal", parent: "3.4.2.1.2.1.3", gen: 8 },
+  { id: "3.4.2.1.2.2", nameUr: "اعجاز احمد", nameEn: "Ijaz Ahmad", parent: "3.4.2.1.2", gen: 6 },
+  { id: "3.4.2.1.2.2.1", nameUr: "امتیاز احمد", nameEn: "Imtiaz Ahmad", parent: "3.4.2.1.2.2", gen: 7 },
+  { id: "3.4.2.1.2.2.1.1", nameUr: "انس احمد", nameEn: "Anas Ahmad", parent: "3.4.2.1.2.2.1", gen: 8 },
+  { id: "3.4.2.1.2.3", nameUr: "نثار احمد", nameEn: "Nisar Ahmad", parent: "3.4.2.1.2", gen: 6 },
+  { id: "3.4.2.1.2.3.1", nameUr: "عبداللہ", nameEn: "Abdullah", parent: "3.4.2.1.2.3", gen: 7 },
+  { id: "3.4.2.1.2.4", nameUr: "سجاد احمد", nameEn: "Sajjad Ahmad", parent: "3.4.2.1.2", gen: 6 },
+  { id: "3.4.2.1.2.4.1", nameUr: "طلال احمد", nameEn: "Talal Ahmad", parent: "3.4.2.1.2.4", gen: 7 },
+  { id: "3.4.2.1.2.4.2", nameUr: "بلال احمد", nameEn: "Bilal Ahmad", parent: "3.4.2.1.2.4", gen: 7 },
+  { id: "3.4.2.1.2.5", nameUr: "نعیم احمد", nameEn: "Naeem Ahmad", parent: "3.4.2.1.2", gen: 6 },
+  { id: "3.4.2.1.2.5.1", nameUr: "ادوہ", nameEn: "Adwah", parent: "3.4.2.1.2.5", gen: 7 },
+  { id: "3.4.2.1.2.5.2", nameUr: "عمران", nameEn: "Imran", parent: "3.4.2.1.2.5", gen: 7 },
+  { id: "3.4.2.1.2.5.3", nameUr: "عرفان", nameEn: "Irfan", parent: "3.4.2.1.2.5", gen: 7 },
+  { id: "3.4.2.1.2.5.4", nameUr: "احمد", nameEn: "Ahmad", parent: "3.4.2.1.2.5", gen: 7 },
+  { id: "3.4.3", nameUr: "اشرف خان", nameEn: "Ashraf Khan", parent: "3.4", gen: 3 },
+  { id: "3.5", nameUr: "رکن الدین", nameEn: "Rukan ud Din", parent: "3", gen: 2 },
+  { id: "3.5.1", nameUr: "فضل الدین", nameEn: "Fazal ud Din", parent: "3.5", gen: 3 },
+  { id: "3.5.1.1", nameUr: "حسن علی", nameEn: "Hassan Ali", parent: "3.5.1", gen: 4 },
+  { id: "3.5.1.1.1", nameUr: "محمد حسین", nameEn: "Muhammad Hussain", parent: "3.5.1.1", gen: 5 },
+  { id: "3.5.1.2", nameUr: "محمد علی", nameEn: "Muhammad Ali", parent: "3.5.1", gen: 4 },
+  { id: "3.5.1.2.1", nameUr: "مظفر حسین", nameEn: "Muzaffar Hussain", parent: "3.5.1.2", gen: 5 },
+  { id: "3.5.1.2.1.1", nameUr: "محمد اسلم", nameEn: "Muhammad Aslam", parent: "3.5.1.2.1", gen: 6 },
+  { id: "3.5.1.2.1.2", nameUr: "محمد اشرف", nameEn: "Muhammad Ashraf", parent: "3.5.1.2.1", gen: 6 },
+  { id: "3.5.1.2.1.2.1", nameUr: "محمد جمیل", nameEn: "Muhammad Jameel", parent: "3.5.1.2.1.2", gen: 7 },
+  { id: "3.5.1.2.1.2.2", nameUr: "محمد ندیم", nameEn: "Muhammad Nadeem", parent: "3.5.1.2.1.2", gen: 7 },
+  { id: "3.5.1.2.2", nameUr: "غلام حسین", nameEn: "Ghulam Hussain", parent: "3.5.1.2", gen: 5 },
+  { id: "3.5.1.2.2.1", nameUr: "محمد امین", nameEn: "Muhammad Ameen", parent: "3.5.1.2.2", gen: 6 },
+  { id: "3.5.1.2.2.1.1", nameUr: "محمد عارف", nameEn: "Muhammad Arif", parent: "3.5.1.2.2.1", gen: 7 },
+  { id: "3.5.1.2.2.2", nameUr: "محمد حنیف", nameEn: "Muhammad Haneef", parent: "3.5.1.2.2", gen: 6 },
+  { id: "3.5.1.2.2.2.1", nameUr: "محمد طاہر", nameEn: "Muhammad Tahir", parent: "3.5.1.2.2.2", gen: 7 },
+  { id: "3.5.1.2.2.2.1.1", nameUr: "محمد زین", nameEn: "Muhammad Zain", parent: "3.5.1.2.2.2.1", gen: 8 },
+  { id: "3.5.1.2.2.2.2", nameUr: "محمد راغب", nameEn: "Muhammad Raghib", parent: "3.5.1.2.2.2", gen: 7 },
+  { id: "3.5.1.2.2.2.3", nameUr: "محمد ثاقب", nameEn: "Muhammad Saqib", parent: "3.5.1.2.2.2", gen: 7 },
+  { id: "3.5.1.2.2.2.4", nameUr: "محمد ظاہر", nameEn: "Muhammad Zahir", parent: "3.5.1.2.2.2", gen: 7 },
+  { id: "3.5.1.2.2.2.4.1", nameUr: "شاہ زیب", nameEn: "Shahzaib", parent: "3.5.1.2.2.2.4", gen: 8 },
+  { id: "3.5.1.2.2.2.4.2", nameUr: "جہان زیب", nameEn: "Jahan Zaib", parent: "3.5.1.2.2.2.4", gen: 8 },
+  { id: "3.5.1.2.2.2.4.3", nameUr: "محمد زیب", nameEn: "Muhammad Zaib", parent: "3.5.1.2.2.2.4", gen: 8 },
+  { id: "3.5.1.2.2.2.5", nameUr: "محمد غالب", nameEn: "Muhammad Ghalib", parent: "3.5.1.2.2.2", gen: 7 },
+  { id: "3.5.1.2.2.2.5.1", nameUr: "شہریار", nameEn: "Shehreyar", parent: "3.5.1.2.2.2.5", gen: 8 },
+  { id: "3.5.1.2.2.2.5.2", nameUr: "اسفندیار", nameEn: "Asfandyar", parent: "3.5.1.2.2.2.5", gen: 8 },
+  { id: "3.5.1.2.2.2.6", nameUr: "محمد آصف", nameEn: "Muhammad Asif", parent: "3.5.1.2.2.2", gen: 7 },
+  { id: "3.5.1.2.2.2.7", nameUr: "محمد عامر", nameEn: "Muhammad Amir", parent: "3.5.1.2.2.2", gen: 7 },
+  { id: "3.5.1.2.3", nameUr: "فتح حسین", nameEn: "Fateh Hussain", parent: "3.5.1.2", gen: 5 },
+  { id: "3.6", nameUr: "شمس الدین", nameEn: "Shams ud Din", parent: "3", gen: 2 },
+  { id: "3.6.1", nameUr: "فضل الدین", nameEn: "Fazal ud Din", parent: "3.6", gen: 3 },
+  { id: "3.6.1.1", nameUr: "چراغ الدین", nameEn: "Chiragh ud Din", parent: "3.6.1", gen: 4 },
+  { id: "3.6.1.1.1", nameUr: "برکت", nameEn: "Barkat", parent: "3.6.1.1", gen: 5 },
+  { id: "3.6.1.2", nameUr: "علم الدین", nameEn: "Ilm ud Din", parent: "3.6.1", gen: 4 },
+  { id: "3.6.1.2.1", nameUr: "محمد حسین", nameEn: "Muhammad Hussain", parent: "3.6.1.2", gen: 5 },
+];
+
+
+// ════════════════════════════════════════════════
+// BUILD LOOKUP MAP
+// ════════════════════════════════════════════════
+const byId = {};
+people.forEach(p => { byId[p.id] = p; });
+
+function getChildren(id) {
+  return people.filter(p => p.parent === id);
+}
+
+function getSiblings(person) {
+  if (!person.parent) return [];
+  return people.filter(p => p.parent === person.parent && p.id !== person.id);
+}
+
+function getAncestorChain(person) {
+  const chain = [];
+  let current = person;
+  while (current.parent) {
+    current = byId[current.parent];
+    if (current) chain.unshift(current);
+  }
+  return chain;
+}
+
+function getGenLabel(gen) {
+  const labels = ["Patriarch","1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th"];
+  return (labels[gen] || gen + "th") + " Generation";
+}
+
+function getInitials(nameEn) {
+  return nameEn.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+}
+
+function waladText(person) {
+  const parent = byId[person.parent];
+  if (!parent) return "";
+  const gp = byId[parent.parent];
+  let t = `ولد ${parent.nameUr}`;
+  if (gp) t += ` ولد ${gp.nameUr}`;
+  return t;
+}
+
+function waladTextEn(person) {
+  const parent = byId[person.parent];
+  if (!parent) return "";
+  const gp = byId[parent.parent];
+  let t = `son of ${parent.nameEn}`;
+  if (gp) t += `, son of ${gp.nameEn}`;
+  return t;
+}
+
+// ════════════════════════════════════════════════
+// RENDER PROFILE
+// ════════════════════════════════════════════════
+function showProfile(id) {
+  const person = byId[id];
+  if (!person) return;
+
+  document.getElementById("searchResults").style.display = "none";
+  document.getElementById("searchInput").value = person.nameUr;
+  document.getElementById("browseSection").style.display = "none";
+
+  const ancestors = getAncestorChain(person);
+  const children = getChildren(id);
+  const siblings = getSiblings(person);
+  const initials = getInitials(person.nameEn);
+
+  let html = `
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">${initials}</div>
+        <div class="profile-names" style="flex:1;">
+          <div class="profile-name-ur">${person.nameUr}</div>
+          <div class="profile-name-en">${person.nameEn}</div>
+          ${person.parent ? `<div class="profile-walad">${waladText(person)}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem;font-style:italic;">${waladTextEn(person)}</div>` : ''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;align-items:flex-end;">
+          <div class="profile-badge">${getGenLabel(person.gen)}</div>
+          ${person.gen > 0 ? `<div style="font-family:'Cinzel';font-size:0.65rem;color:var(--text-muted);text-align:right;">Gen ${person.gen} from<br>Muhammad Saleh</div>` : ''}
+        </div>
+      </div>
+      <div class="profile-body">
+  `;
+
+  // Ancestor chain
+  if (ancestors.length > 0) {
+    html += `<div class="section-label">Lineage — نسب</div>
+    <div class="ancestor-chain">`;
+    ancestors.forEach((anc, i) => {
+      html += `<div class="ancestor-row" onclick="showProfile('${anc.id}')">
+        <span class="anc-gen">${anc.gen}</span>
+        <span class="anc-connector">${i < ancestors.length - 1 ? '↑' : '↑'}</span>
+        <span class="anc-name-ur">${anc.nameUr}</span>
+        <span class="anc-name-en">${anc.nameEn}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Current person highlight
+  html += `<div class="section-label">This Person — یہ شخص</div>
+  <div class="people-grid" style="margin-bottom:1.8rem;">
+    <div class="person-chip self">
+      <span class="chip-label">Current</span>
+      <span class="chip-name-ur">${person.nameUr}</span>
+      <span class="chip-name-en">${person.nameEn}</span>
+    </div>
+  </div>`;
+
+  // Siblings
+  if (siblings.length > 0) {
+    html += `<div class="section-label">Brothers — بھائی (${siblings.length})</div>
+    <div class="people-grid">`;
+    siblings.forEach(s => {
+      html += `<div class="person-chip" onclick="showProfile('${s.id}')">
+        <span class="chip-label">Brother</span>
+        <span class="chip-name-ur">${s.nameUr}</span>
+        <span class="chip-name-en">${s.nameEn}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Children
+  html += `<div class="section-label">Sons — بیٹے (${children.length})</div>`;
+  if (children.length > 0) {
+    html += `<div class="people-grid">`;
+    children.forEach(c => {
+      const grandchildren = getChildren(c.id);
+      html += `<div class="person-chip" onclick="showProfile('${c.id}')">
+        <span class="chip-label">${grandchildren.length > 0 ? grandchildren.length + ' known sons' : 'Son'}</span>
+        <span class="chip-name-ur">${c.nameUr}</span>
+        <span class="chip-name-en">${c.nameEn}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<p class="no-children">No sons recorded in this branch — اس شاخ میں بیٹے درج نہیں</p>`;
+  }
+
+  // Back button
+  html += `
+    <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <button onclick="showBrowse()" style="background:transparent;border:1px solid var(--border);color:var(--text-secondary);padding:0.5rem 1.2rem;cursor:pointer;font-family:'EB Garamond';font-size:0.95rem;border-radius:3px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold-dim)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)'">
+        ← Back to full family / واپس
+      </button>
+    </div>
+  `;
+
+  html += `</div></div>`;
+
+  const section = document.getElementById("profileSection");
+  section.innerHTML = html;
+  section.style.display = "block";
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ════════════════════════════════════════════════
+// BROWSE BY GENERATION
+// ════════════════════════════════════════════════
+function showBrowse() {
+  document.getElementById("profileSection").style.display = "none";
+  document.getElementById("browseSection").style.display = "block";
+  document.getElementById("searchInput").value = "";
+  document.getElementById("searchResults").style.display = "none";
+  document.getElementById("browseSection").scrollIntoView({ behavior: "smooth" });
+}
+
+function renderBrowse() {
+  const maxGen = Math.max(...people.map(p => p.gen));
+  let html = "";
+  for (let g = 0; g <= maxGen; g++) {
+    const group = people.filter(p => p.gen === g);
+    if (group.length === 0) continue;
+    html += `<div class="gen-section">
+      <div class="gen-header">
+        <div class="gen-num">${getGenLabel(g)}</div>
+        <div class="gen-line"></div>
+        <div style="font-size:0.75rem;color:var(--text-muted);font-family:'Cinzel';">${group.length} person${group.length > 1 ? 's' : ''}</div>
+      </div>
+      <div class="gen-grid">`;
+    group.forEach(p => {
+      html += `<div class="person-chip" onclick="showProfile('${p.id}')">
+        <span class="chip-name-ur">${p.nameUr}</span>
+        <span class="chip-name-en">${p.nameEn}</span>
+        ${p.parent ? `<span class="chip-label">ولد ${byId[p.parent] ? byId[p.parent].nameUr : ''}</span>` : ''}
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+  document.getElementById("genContainer").innerHTML = html;
+}
+
+// ════════════════════════════════════════════════
+// SEARCH
+// ════════════════════════════════════════════════
+const searchInput = document.getElementById("searchInput");
+const searchResults = document.getElementById("searchResults");
+
+searchInput.addEventListener("input", function() {
+  const q = this.value.trim().toLowerCase();
+  if (q.length < 1) { searchResults.style.display = "none"; return; }
+  const matches = people.filter(p =>
+    p.nameUr.includes(q) ||
+    p.nameEn.toLowerCase().includes(q) ||
+    (p.id.toLowerCase().includes(q))
+  ).slice(0, 12);
+  if (matches.length === 0) { searchResults.style.display = "none"; return; }
+  searchResults.innerHTML = matches.map(p => `
+    <div class="search-result-item" onclick="showProfile('${p.id}')">
+      <div>
+        <div class="sri-name-ur">${p.nameUr}</div>
+        <div class="sri-name-en">${p.nameEn} · ${p.parent && byId[p.parent] ? 'son of ' + byId[p.parent].nameEn : 'Patriarch'}</div>
+      </div>
+      <div class="sri-gen">${getGenLabel(p.gen)}</div>
+    </div>
+  `).join("");
+  searchResults.style.display = "block";
+});
+
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".search-section")) {
+    searchResults.style.display = "none";
+  }
+});
+
+// ════════════════════════════════════════════════
+// BRANCH NAVIGATOR
+// ════════════════════════════════════════════════
+const BRANCHES = [
+  { id: "1", nameUr: "محمد بخش", nameEn: "Muhammad Bakhsh", ordinal: "1st Son" },
+  { id: "2", nameUr: "امام بخش",  nameEn: "Imam Bakhsh",    ordinal: "2nd Son" },
+  { id: "3", nameUr: "ایزد بخش", nameEn: "Aezad Bakhsh",   ordinal: "3rd Son" },
+];
+
+function countDescendants(id) {
+  const kids = getChildren(id);
+  if (kids.length === 0) return 0;
+  return kids.reduce((sum, c) => sum + 1 + countDescendants(c.id), 0);
+}
+
+function renderBranchNav() {
+  const container = document.getElementById("branchCards");
+  container.innerHTML = BRANCHES.map(b => {
+    const total = countDescendants(b.id);
+    const sons = getChildren(b.id);
+    const sonsHtml = sons.length
+      ? sons.map(s => {
+          const grandCount = countDescendants(s.id);
+          return `<div class="branch-member" onclick="showProfile('${s.id}')">
+            <span class="branch-member-ur">${s.nameUr}</span>
+            <span class="branch-member-en">${s.nameEn}</span>
+            ${grandCount > 0 ? `<span class="branch-count">${grandCount}</span>` : ""}
+          </div>`;
+        }).join("")
+      : `<div style="color:var(--text-muted);font-size:0.85rem;padding:0.5rem 0;font-style:italic;">No descendants recorded</div>`;
+
+    return `<div class="branch-card" id="branch-card-${b.id}">
+      <div class="branch-card-header" onclick="toggleBranch('${b.id}')">
+        <div class="branch-num">${b.ordinal}</div>
+        <div class="branch-names">
+          <div class="branch-name-ur">${b.nameUr}</div>
+          <div class="branch-name-en">${b.nameEn}</div>
+        </div>
+        <span class="branch-toggle" id="branch-toggle-${b.id}">▾</span>
+      </div>
+      <div class="branch-body" id="branch-body-${b.id}">
+        <div class="branch-body-label">${total} descendants · ${sons.length} sons</div>
+        <div class="branch-member-list">
+          <div class="branch-member" onclick="showProfile('${b.id}')" style="border-bottom:1px solid var(--border);margin-bottom:0.3rem;padding-bottom:0.5rem;">
+            <span class="branch-member-ur">${b.nameUr}</span>
+            <span class="branch-member-en" style="color:var(--gold-dim);">View full profile →</span>
+          </div>
+          ${sonsHtml}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function toggleBranch(branchId) {
+  const body = document.getElementById("branch-body-" + branchId);
+  const toggle = document.getElementById("branch-toggle-" + branchId);
+  const isOpen = body.classList.contains("open");
+  // Close all first
+  BRANCHES.forEach(b => {
+    document.getElementById("branch-body-" + b.id).classList.remove("open");
+    document.getElementById("branch-toggle-" + b.id).classList.remove("open");
+  });
+  if (!isOpen) {
+    body.classList.add("open");
+    toggle.classList.add("open");
+  }
+}
+
+// ════════════════════════════════════════════════
+// VIEW SWITCHER
+// ════════════════════════════════════════════════
+function switchView(mode) {
+  const browseEls = ['branchNav', 'browseSection'];
+  const treeEls   = ['treeSection'];
+  const searchEl  = document.querySelector('.search-section');
+  const profileEl = document.getElementById('profileSection');
+
+  if (mode === 'tree') {
+    browseEls.forEach(id => document.getElementById(id).style.display = 'none');
+    treeEls.forEach(id => document.getElementById(id).style.display = 'block');
+    searchEl.style.display = 'none';
+    profileEl.style.display = 'none';
+    document.getElementById('btnBrowse').classList.remove('active');
+    document.getElementById('btnTree').classList.add('active');
+    if (!treeInitialized) initTree('0');
+  } else {
+    browseEls.forEach(id => document.getElementById(id).style.display = '');
+    treeEls.forEach(id => document.getElementById(id).style.display = 'none');
+    searchEl.style.display = '';
+    document.getElementById('btnBrowse').classList.add('active');
+    document.getElementById('btnTree').classList.remove('active');
+  }
+}
+
+// ════════════════════════════════════════════════
+// D3 INTERACTIVE FAMILY TREE
+// ════════════════════════════════════════════════
+let treeInitialized = false;
+let currentZoom = null;
+let currentSvg = null;
+
+const BRANCH_COLORS = {
+  '1': '#c9a84c',  // gold — Muhammad Bakhsh
+  '2': '#4a8c9a',  // teal — Imam Bakhsh
+  '3': '#7a6aaa',  // purple — Aezad Bakhsh
+};
+
+function getBranchColor(id) {
+  if (!id) return '#6b5f4a';
+  const topId = id.split('.')[0];
+  return BRANCH_COLORS[topId] || '#6b5f4a';
+}
+
+function buildHierarchy(rootId) {
+  const root = byId[rootId];
+  if (!root) return null;
+  function recurse(person) {
+    const kids = getChildren(person.id);
+    const node = { data: person };
+    if (kids.length) node.children = kids.map(recurse);
+    return node;
+  }
+  return recurse(root);
+}
+
+function setTreeRoot(rootId) {
+  // update button states
+  ['treeBtnAll','treeBtnB1','treeBtnB2','treeBtnB3'].forEach(b => document.getElementById(b).classList.remove('active'));
+  const map = {'0':'treeBtnAll','1':'treeBtnB1','2':'treeBtnB2','3':'treeBtnB3'};
+  if (map[rootId]) document.getElementById(map[rootId]).classList.add('active');
+  initTree(rootId);
+}
+
+function initTree(rootId) {
+  treeInitialized = true;
+  const svgEl = document.getElementById('treeCanvas');
+  svgEl.innerHTML = '';
+
+  const W = svgEl.clientWidth || svgEl.parentElement.clientWidth || 900;
+  const H = Math.max(560, window.innerHeight * 0.65);
+  svgEl.setAttribute('height', H);
+
+  const hier = buildHierarchy(rootId);
+  if (!hier) return;
+
+  const d3root = d3.hierarchy(hier, d => d.children);
+  const nodeCount = d3root.descendants().length;
+  const nodeSize = nodeCount > 200 ? [36, 160] : nodeCount > 80 ? [44, 180] : [52, 200];
+
+  const treeLayout = d3.tree().nodeSize(nodeSize);
+  treeLayout(d3root);
+
+  // Compute bounds
+  let x0 = Infinity, x1 = -Infinity;
+  d3root.each(d => { if (d.x < x0) x0 = d.x; if (d.x > x1) x1 = d.x; });
+
+  const svg = d3.select(svgEl);
+  currentSvg = svg;
+
+  const zoomBehavior = d3.zoom()
+    .scaleExtent([0.05, 4])
+    .on('zoom', (event) => { g.attr('transform', event.transform); });
+  svg.call(zoomBehavior);
+  currentZoom = zoomBehavior;
+
+  const g = svg.append('g');
+
+  // Links
+  g.selectAll('.tree-link')
+    .data(d3root.links())
+    .join('path')
+    .attr('class', 'tree-link')
+    .attr('d', d3.linkVertical()
+      .x(d => d.x)
+      .y(d => d.y));
+
+  // Nodes
+  const tooltip = document.getElementById('treeTooltip');
+  const node = g.selectAll('.tree-node')
+    .data(d3root.descendants())
+    .join('g')
+    .attr('class', d => `tree-node${d.depth === 0 ? ' root' : ''}`)
+    .attr('transform', d => `translate(${d.x},${d.y})`);
+
+  const r = nodeCount > 200 ? 10 : nodeCount > 80 ? 12 : 14;
+
+  node.append('circle')
+    .attr('r', r)
+    .attr('stroke', d => getBranchColor(d.data.data.id))
+    .on('mouseover', function(event, d) {
+      const p = d.data.data;
+      document.getElementById('ttNameUr').textContent = p.nameUr;
+      document.getElementById('ttNameEn').textContent = p.nameEn;
+      const kids = getChildren(p.id);
+      document.getElementById('ttMeta').textContent = `Gen ${p.gen} · ${kids.length} son${kids.length !== 1 ? 's' : ''} recorded`;
+      tooltip.classList.add('visible');
+    })
+    .on('mousemove', function(event) {
+      tooltip.style.left = (event.clientX + 14) + 'px';
+      tooltip.style.top  = (event.clientY - 10) + 'px';
+    })
+    .on('mouseout', function() { tooltip.classList.remove('visible'); })
+    .on('click', function(event, d) {
+      tooltip.classList.remove('visible');
+      switchView('browse');
+      showProfile(d.data.data.id);
+    });
+
+  // Name labels — English below, Urdu above
+  node.append('text')
+    .attr('class', 'name-en')
+    .attr('dy', r + 14)
+    .attr('text-anchor', 'middle')
+    .text(d => {
+      const en = d.data.data.nameEn;
+      return en.length > 16 ? en.slice(0, 14) + '…' : en;
+    });
+
+  node.append('text')
+    .attr('class', 'name-ur')
+    .attr('dy', -(r + 5))
+    .attr('text-anchor', 'middle')
+    .text(d => {
+      const ur = d.data.data.nameUr;
+      return ur.length > 8 ? ur.slice(0, 7) + '…' : ur;
+    });
+
+  // Initial transform — center on root
+  const treeWidth = x1 - x0;
+  const initScale = nodeCount > 300 ? 0.28 : nodeCount > 100 ? 0.45 : nodeCount > 40 ? 0.65 : 0.85;
+  const initX = W / 2 - d3root.x * initScale;
+  const initY = 40;
+  svg.call(zoomBehavior.transform, d3.zoomIdentity.translate(initX, initY).scale(initScale));
+}
+
+function treeZoom(factor) {
+  if (currentSvg && currentZoom) {
+    currentSvg.transition().duration(250).call(currentZoom.scaleBy, factor);
+  }
+}
+
+function treeResetZoom() {
+  if (currentSvg && currentZoom) {
+    const svgEl = document.getElementById('treeCanvas');
+    const W = svgEl.clientWidth || 900;
+    currentSvg.transition().duration(300).call(
+      currentZoom.transform,
+      d3.zoomIdentity.translate(W / 2, 40).scale(0.5)
+    );
+  }
+}
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+renderBranchNav();
+renderBrowse();
+
+</script>
+</body>
+</html>

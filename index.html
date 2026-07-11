@@ -1855,11 +1855,25 @@ function renderBrowse() {
 const searchInput = document.getElementById("searchInput");
 const searchResults = document.getElementById("searchResults");
 
+// Different keyboards/devices type visually-identical Urdu letters using
+// different Unicode code points (e.g. Arabic Yeh "ي" U+064A vs Urdu Yeh "ی" U+06CC).
+// This maps all common variants to one canonical form so searches match
+// regardless of which keyboard/IME produced the text.
+function normalizeUrdu(str) {
+  return str
+    .normalize("NFC")
+    .replace(/[\u064A\u0649]/g, "\u06CC")   // Arabic Yeh, Alef Maksura -> Urdu Yeh (ی)
+    .replace(/\u0643/g, "\u06A9")           // Arabic Kaf -> Urdu Keheh (ک)
+    .replace(/\u0647/g, "\u06C1")           // Arabic Heh -> Urdu Heh Goal (ہ)
+    .replace(/[\u064B-\u065F\u0670]/g, "") // strip diacritics/harakat that vary between typed input and stored text
+    .toLowerCase();
+}
+
 searchInput.addEventListener("input", function() {
-  const q = this.value.trim().toLowerCase();
+  const q = normalizeUrdu(this.value.trim());
   if (q.length < 1) { searchResults.style.display = "none"; return; }
   const matches = people.filter(p =>
-    p.nameUr.includes(q) ||
+    normalizeUrdu(p.nameUr).includes(q) ||
     p.nameEn.toLowerCase().includes(q) ||
     (p.id.toLowerCase().includes(q))
   ).slice(0, 12);

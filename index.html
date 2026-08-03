@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>شجرہ نسب — خاندان چنجوہ</title>
+<title>شجرہ نسب — خاندان جنجوعہ</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
@@ -23,6 +23,8 @@
     --accent: #c9a84c;
     --green: #4a8c6a;
     --green-light: #7dbfa0;
+    --blue: #4f7396;
+    --blue-light: #85aac9;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -354,6 +356,110 @@
   .view-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
   .view-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
 
+  /* ── GLOSSARY ── */
+  .glossary-section {
+    max-width: 900px;
+    margin: 1rem auto 3rem;
+    padding: 0 1.5rem;
+  }
+  .glossary-filter-input {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    color: var(--text-primary);
+    padding: 0.75rem 1.1rem;
+    border-radius: 4px;
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 1rem;
+    direction: ltr;
+  }
+  .glossary-filter-input:focus { border-color: var(--gold); }
+  .glossary-legend {
+    display: flex;
+    gap: 1.4rem;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.03rem;
+  }
+  .glossary-legend-item { display: flex; align-items: center; gap: 0.4rem; color: var(--text-secondary); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .az-jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    position: sticky;
+    top: 0;
+    background: var(--bg-deep);
+    padding: 0.6rem 0;
+    z-index: 5;
+    border-bottom: 1px solid var(--border);
+  }
+  .az-letter {
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.2rem 0.55rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .az-letter:hover { border-color: var(--gold); color: var(--gold); }
+  .glossary-letter-header {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 1.3rem;
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 0 0.3rem;
+    margin-top: 1.8rem;
+    letter-spacing: 0.15rem;
+    scroll-margin-top: 3.5rem;
+  }
+  .glossary-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0.3rem;
+    border-bottom: 1px solid rgba(201,168,76,0.06);
+    cursor: pointer;
+    gap: 1rem;
+    flex-wrap: wrap;
+    transition: background 0.15s;
+  }
+  .glossary-entry:hover { background: rgba(201,168,76,0.06); }
+  .glossary-entry-main { display: flex; flex-direction: column; gap: 0.1rem; cursor: pointer; }
+  .glossary-name-en { font-family: 'EB Garamond', serif; font-size: 1rem; color: var(--text-primary); }
+  .glossary-name-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 0.95rem; color: var(--text-secondary); direction: rtl; }
+  .glossary-entry-meta { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .glossary-section-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    padding: 0.22rem 0.6rem;
+    border-radius: 2px;
+    letter-spacing: 0.02rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .glossary-section-tag:hover { filter: brightness(1.35); }
+  .glossary-section-tag.sec-1 { color: #e8c97a; background: rgba(201,168,76,0.14); border: 1px solid rgba(201,168,76,0.35); }
+  .glossary-section-tag.sec-2 { color: #7dd4e0; background: rgba(74,140,154,0.16); border: 1px solid rgba(74,140,154,0.4); }
+  .glossary-section-tag.sec-3 { color: #b8a8ef; background: rgba(122,106,170,0.16); border: 1px solid rgba(122,106,170,0.4); }
+  .glossary-section-tag.sec-root { color: var(--text-muted); background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
+  .glossary-gen-tag { font-size: 0.68rem; color: var(--text-muted); font-family: 'Cinzel', serif; white-space: nowrap; cursor: pointer; }
+  .glossary-empty { text-align: center; color: var(--text-muted); font-style: italic; padding: 2rem 0; }
+  @media (max-width: 600px) {
+    .glossary-entry { flex-direction: column; align-items: flex-start; }
+    .glossary-entry-meta { justify-content: flex-start; }
+  }
+
   /* ── INTERACTIVE TREE SECTION ── */
   .tree-section {
     max-width: 100%;
@@ -432,6 +538,18 @@
   .tree-node circle:hover { fill: rgba(201,168,76,0.15); stroke: var(--gold); }
   .tree-node.root circle { fill: rgba(201,168,76,0.18); stroke: var(--gold); stroke-width: 2; }
   .tree-node.highlighted circle { fill: rgba(201,168,76,0.25); stroke: var(--gold-light); stroke-width: 2.5; }
+  .tree-node-focus circle {
+    animation: treeNodeFocusPulse 1.3s ease-in-out 2;
+  }
+  .tree-node-focus text.name-en,
+  .tree-node-focus text.name-ur {
+    fill: var(--gold-light);
+    font-weight: 700;
+  }
+  @keyframes treeNodeFocusPulse {
+    0%, 100% { stroke-width: 2px; filter: drop-shadow(0 0 0px var(--gold)); }
+    50% { stroke-width: 5px; filter: drop-shadow(0 0 10px var(--gold-light)); }
+  }
   .tree-node text {
     font-family: 'EB Garamond', serif;
     font-size: 11px;
@@ -568,8 +686,8 @@
 <body>
 
 <header class="header">
-  <div class="header-title-ur">شجرہ نسب — خاندان چنجوہ راجپوت</div>
-  <div class="header-title-en">Shajra Nasab — Chanjuha Rajput Lineage</div>
+  <div class="header-title-ur">شجرہ نسب — خاندان جنجوعہ راجپوت</div>
+  <div class="header-title-en">Shajra Nasab — Janjua Rajput Lineage</div>
   <div class="header-meta">
     <span><span class="dot">✦</span> بانی: محمد صالح <span class="dot">✦</span></span>
     <span>Patriarch: Muhammad Saleh</span>
@@ -581,6 +699,7 @@
 <div class="view-switcher">
   <button class="view-btn active" id="btnBrowse" onclick="switchView('browse')">✦ Browse</button>
   <button class="view-btn" id="btnTree" onclick="switchView('tree')">⋮ Family Tree</button>
+  <button class="view-btn" id="btnGlossary" onclick="switchView('glossary')">🔤 Glossary</button>
 </div>
 
 <!-- Branch Navigator -->
@@ -602,6 +721,20 @@
 <div class="browse-section" id="browseSection">
   <div class="browse-title">✦ Browse by Generation ✦</div>
   <div id="genContainer"></div>
+</div>
+
+<!-- Alphabetical Glossary -->
+<div class="glossary-section" id="glossarySection" style="display:none;">
+  <div class="browse-title">✦ Alphabetical Glossary ✦</div>
+  <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin:-0.8rem 0 1.2rem;">Every name in the tree, A–Z, tagged with its branch and section. Tap a name for their profile, or tap the section tag (⌕) to zoom straight to that section on the Family Tree.</p>
+  <input class="glossary-filter-input" id="glossaryFilterInput" type="text" placeholder="Filter the glossary — type a name...">
+  <div class="glossary-legend">
+    <span class="glossary-legend-item"><span class="legend-dot" style="background:#c9a84c;"></span>Branch 1 — Muhammad Bakhsh</span>
+    <span class="glossary-legend-item"><span class="legend-dot" style="background:#4a8c9a;"></span>Branch 2 — Imam Bakhsh</span>
+    <span class="glossary-legend-item"><span class="legend-dot" style="background:#7a6aaa;"></span>Branch 3 — Aezad Bakhsh</span>
+  </div>
+  <div class="az-jump" id="azJump"></div>
+  <div id="glossaryContainer"></div>
 </div>
 
 <!-- Interactive Tree Section -->
@@ -627,7 +760,7 @@
 </div>
 
 <footer class="footer">
-  <div class="footer-ur">محمد صالح (بانی) — تین بیٹے: محمد بخش، امام بخش، ایزد بخش — قوم راجپوت چنجوہ</div>
+  <div class="footer-ur">محمد صالح (بانی) — تین بیٹے: محمد بخش، امام بخش، ایزد بخش — قوم راجپوت جنجوعہ</div>
   <div>Compiled from the Shajra Nasab chart · All three sons' lineages documented</div>
 </footer>
 
@@ -1716,6 +1849,7 @@ function showProfile(id) {
   document.getElementById("searchResults").style.display = "none";
   document.getElementById("searchInput").value = person.nameUr;
   document.getElementById("browseSection").style.display = "none";
+  document.getElementById("glossarySection").style.display = "none";
 
   const ancestors = getAncestorChain(person);
   const children = getChildren(id);
@@ -1819,8 +1953,12 @@ function showProfile(id) {
 function showBrowse() {
   document.getElementById("profileSection").style.display = "none";
   document.getElementById("browseSection").style.display = "block";
+  document.getElementById("glossarySection").style.display = "none";
   document.getElementById("searchInput").value = "";
   document.getElementById("searchResults").style.display = "none";
+  document.getElementById("btnBrowse").classList.add("active");
+  document.getElementById("btnGlossary").classList.remove("active");
+  document.getElementById("btnTree").classList.remove("active");
   document.getElementById("browseSection").scrollIntoView({ behavior: "smooth" });
 }
 
@@ -1869,12 +2007,21 @@ function normalizeUrdu(str) {
     .toLowerCase();
 }
 
+// Strips spaces so compound names typed as one word (e.g. "Nasiruddin") still
+// match names stored with spaces (e.g. "Nasir ud Din"), and vice versa.
+function stripSpaces(str) {
+  return str.toLowerCase().replace(/\s+/g, "");
+}
+
 searchInput.addEventListener("input", function() {
-  const q = normalizeUrdu(this.value.trim());
+  const raw = this.value.trim();
+  const q = normalizeUrdu(raw);
+  const qNoSpace = stripSpaces(raw);
   if (q.length < 1) { searchResults.style.display = "none"; return; }
   const matches = people.filter(p =>
     normalizeUrdu(p.nameUr).includes(q) ||
     p.nameEn.toLowerCase().includes(q) ||
+    stripSpaces(p.nameEn).includes(qNoSpace) ||
     (p.id.toLowerCase().includes(q))
   ).slice(0, 12);
   if (matches.length === 0) { searchResults.style.display = "none"; return; }
@@ -1966,29 +2113,140 @@ function toggleBranch(branchId) {
 }
 
 // ════════════════════════════════════════════════
+// ALPHABETICAL GLOSSARY
+// ════════════════════════════════════════════════
+// Every person is tagged with the branch (gen-1 son of Muhammad Saleh) and,
+// where one exists, the sub-branch/"section" (gen-2 grandson) their line
+// descends from — so a huge tree can still be scanned A-Z and traced back
+// to a specific part of the tree.
+function getSection(person) {
+  const chain = getAncestorChain(person).concat([person]); // root ... person
+  const branch = chain.find(p => p.gen === 1) || null;
+  const subBranch = chain.find(p => p.gen === 2) || null;
+  return { branch, subBranch };
+}
+
+function getSectionLabel(person) {
+  const { branch, subBranch } = getSection(person);
+  if (!branch) return "Patriarch";
+  if (!subBranch) return `${branch.nameEn} (Branch Head)`;
+  return `${branch.nameEn} › ${subBranch.nameEn}`;
+}
+
+let glossaryRendered = false;
+
+function renderGlossary() {
+  const container = document.getElementById("glossaryContainer");
+  const azJump = document.getElementById("azJump");
+
+  const sorted = [...people].sort((a, b) => a.nameEn.localeCompare(b.nameEn, "en", { sensitivity: "base" }));
+  const letters = [...new Set(sorted.map(p => p.nameEn[0].toUpperCase()))].sort();
+
+  azJump.innerHTML = letters.map(l => `<a href="#glos-${l}" class="az-letter">${l}</a>`).join("");
+
+  let html = "";
+  let currentLetter = "";
+  sorted.forEach(p => {
+    const letter = p.nameEn[0].toUpperCase();
+    if (letter !== currentLetter) {
+      if (currentLetter !== "") html += `</div>`;
+      html += `<div class="glossary-letter-group" data-letter="${letter}">
+        <div class="glossary-letter-header" id="glos-${letter}">${letter}</div>`;
+      currentLetter = letter;
+    }
+    const { branch, subBranch } = getSection(p);
+    const tagClass = branch ? ("sec-" + branch.id) : "sec-root";
+    const jumpId = subBranch ? subBranch.id : (branch ? branch.id : "0");
+    html += `
+      <div class="glossary-entry" data-name-en="${p.nameEn.toLowerCase()}" data-name-ur="${p.nameUr}">
+        <div class="glossary-entry-main" onclick="showProfile('${p.id}')">
+          <span class="glossary-name-en">${p.nameEn}</span>
+          <span class="glossary-name-ur">${p.nameUr}</span>
+        </div>
+        <div class="glossary-entry-meta">
+          <span class="glossary-section-tag ${tagClass}" onclick="event.stopPropagation(); zoomToSection('${jumpId}', '${p.id}')" title="View this person in the Family Tree">${getSectionLabel(p)} ⌕</span>
+          <span class="glossary-gen-tag" onclick="showProfile('${p.id}')">${getGenLabel(p.gen)}</span>
+        </div>
+      </div>`;
+  });
+  if (currentLetter !== "") html += `</div>`;
+  container.innerHTML = html || `<p class="glossary-empty">No names found.</p>`;
+  glossaryRendered = true;
+}
+
+function zoomToSection(sectionId, personId) {
+  switchView("tree");
+  focusOnPerson(personId || sectionId, sectionId);
+}
+
+function focusOnPerson(personId, rootId) {
+  initTree(rootId);
+  const pos = currentTreeNodeMap[personId];
+  if (!pos || !currentSvg || !currentZoom) return;
+
+  const svgEl = document.getElementById("treeCanvas");
+  const W = svgEl.clientWidth || svgEl.parentElement.clientWidth || 900;
+  const targetScale = 1.15;
+  const tx = W / 2 - pos.x * targetScale;
+  const ty = 140 - pos.y * targetScale;
+
+  currentSvg.transition().duration(550).call(
+    currentZoom.transform,
+    d3.zoomIdentity.translate(tx, ty).scale(targetScale)
+  );
+
+  const nodeEl = document.getElementById("tnode-" + personId);
+  if (nodeEl) {
+    nodeEl.classList.add("tree-node-focus");
+    setTimeout(() => nodeEl.classList.remove("tree-node-focus"), 2600);
+  }
+}
+
+document.getElementById("glossaryFilterInput").addEventListener("input", function() {
+  const raw = this.value.trim();
+  const q = normalizeUrdu(raw);
+  const qNoSpace = stripSpaces(raw);
+  document.querySelectorAll(".glossary-letter-group").forEach(group => {
+    let anyVisible = false;
+    group.querySelectorAll(".glossary-entry").forEach(entry => {
+      const nameEn = entry.dataset.nameEn;
+      const nameUr = entry.dataset.nameUr;
+      const match = q.length === 0 ||
+        nameEn.includes(q) ||
+        normalizeUrdu(nameUr).includes(q) ||
+        stripSpaces(nameEn).includes(qNoSpace);
+      entry.style.display = match ? "" : "none";
+      if (match) anyVisible = true;
+    });
+    group.style.display = anyVisible ? "" : "none";
+  });
+});
+
+// ════════════════════════════════════════════════
 // VIEW SWITCHER
 // ════════════════════════════════════════════════
 function switchView(mode) {
-  const browseEls = ['branchNav', 'browseSection'];
-  const treeEls   = ['treeSection'];
-  const searchEl  = document.querySelector('.search-section');
-  const profileEl = document.getElementById('profileSection');
+  const browseEls    = ['branchNav', 'browseSection'];
+  const treeEls      = ['treeSection'];
+  const glossaryEls  = ['glossarySection'];
+  const searchEl     = document.querySelector('.search-section');
+  const profileEl    = document.getElementById('profileSection');
+
+  browseEls.forEach(id => document.getElementById(id).style.display = (mode === 'browse') ? '' : 'none');
+  treeEls.forEach(id => document.getElementById(id).style.display = (mode === 'tree') ? 'block' : 'none');
+  glossaryEls.forEach(id => document.getElementById(id).style.display = (mode === 'glossary') ? 'block' : 'none');
+  searchEl.style.display = (mode === 'tree') ? 'none' : '';
+  profileEl.style.display = 'none';
+
+  document.getElementById('btnBrowse').classList.toggle('active', mode === 'browse');
+  document.getElementById('btnTree').classList.toggle('active', mode === 'tree');
+  document.getElementById('btnGlossary').classList.toggle('active', mode === 'glossary');
 
   if (mode === 'tree') {
-    browseEls.forEach(id => document.getElementById(id).style.display = 'none');
-    treeEls.forEach(id => document.getElementById(id).style.display = 'block');
-    searchEl.style.display = 'none';
-    profileEl.style.display = 'none';
-    document.getElementById('btnBrowse').classList.remove('active');
-    document.getElementById('btnTree').classList.add('active');
-    if (!treeInitialized) initTree('0');
-  } else {
-    browseEls.forEach(id => document.getElementById(id).style.display = '');
-    treeEls.forEach(id => document.getElementById(id).style.display = 'none');
-    searchEl.style.display = '';
-    document.getElementById('btnBrowse').classList.add('active');
-    document.getElementById('btnTree').classList.remove('active');
+    document.getElementById('treeSection').scrollIntoView({ behavior: 'auto', block: 'start' });
   }
+  if (mode === 'tree' && !treeInitialized) initTree('0');
+  if (mode === 'glossary' && !glossaryRendered) renderGlossary();
 }
 
 // ════════════════════════════════════════════════
@@ -1997,6 +2255,7 @@ function switchView(mode) {
 let treeInitialized = false;
 let currentZoom = null;
 let currentSvg = null;
+let currentTreeNodeMap = {}; // personId -> {x, y} in the current tree layout
 
 const BRANCH_COLORS = {
   '1': '#c9a84c',  // gold — Muhammad Bakhsh
@@ -2075,10 +2334,14 @@ function initTree(rootId) {
 
   // Nodes
   const tooltip = document.getElementById('treeTooltip');
+  currentTreeNodeMap = {};
+  d3root.each(d => { currentTreeNodeMap[d.data.data.id] = { x: d.x, y: d.y }; });
+
   const node = g.selectAll('.tree-node')
     .data(d3root.descendants())
     .join('g')
     .attr('class', d => `tree-node${d.depth === 0 ? ' root' : ''}`)
+    .attr('id', d => 'tnode-' + d.data.data.id)
     .attr('transform', d => `translate(${d.x},${d.y})`);
 
   const r = nodeCount > 200 ? 10 : nodeCount > 80 ? 12 : 14;
@@ -2123,6 +2386,47 @@ function initTree(rootId) {
       const ur = d.data.data.nameUr;
       return ur.length > 8 ? ur.slice(0, 7) + '…' : ur;
     });
+
+  // Section markers — dashed dividers + clickable labels for the same
+  // "sections" (gen-2 sub-branches) used in the Glossary, so the tree can be
+  // scanned visually and zoomed straight into the section you're after.
+  const sectionNodes = d3root.descendants().filter(d => d.data.data.gen === 2 && d.depth > 0);
+  if (sectionNodes.length > 1) {
+    const refY = sectionNodes[0].y - 46;
+    const sectionLayer = g.append('g').attr('class', 'section-layer');
+
+    sectionNodes.forEach(sn => {
+      let minX = Infinity, maxX = -Infinity;
+      sn.descendants().forEach(n => { if (n.x < minX) minX = n.x; if (n.x > maxX) maxX = n.x; });
+      const color = getBranchColor(sn.data.data.id);
+      const midX = (minX + maxX) / 2;
+
+      const grp = sectionLayer.append('g')
+        .style('cursor', 'pointer')
+        .on('click', () => setTreeRoot(sn.data.data.id))
+        .on('mouseover', function() { d3.select(this).select('text').attr('opacity', 1); })
+        .on('mouseout', function() { d3.select(this).select('text').attr('opacity', 0.8); });
+
+      grp.append('path')
+        .attr('d', `M${minX},${refY + 10} L${minX},${refY} L${maxX},${refY} L${maxX},${refY + 10}`)
+        .attr('fill', 'none')
+        .attr('stroke', color)
+        .attr('stroke-width', 1.3)
+        .attr('stroke-dasharray', '4,3')
+        .attr('opacity', 0.65);
+
+      grp.append('text')
+        .attr('x', midX)
+        .attr('y', refY - 8)
+        .attr('text-anchor', 'middle')
+        .attr('fill', color)
+        .attr('opacity', 0.8)
+        .attr('font-family', "'Cinzel', serif")
+        .attr('font-size', '11px')
+        .attr('font-weight', '600')
+        .text(`§ ${sn.data.data.nameEn}`);
+    });
+  }
 
   // Initial transform — center on root
   const treeWidth = x1 - x0;

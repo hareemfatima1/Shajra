@@ -525,6 +525,7 @@
     border-radius: 6px;
     display: block;
     cursor: grab;
+    touch-action: none;
   }
   #treeCanvas:active { cursor: grabbing; }
   /* D3 tree node styles */
@@ -2317,9 +2318,25 @@ function initTree(rootId) {
 
   const zoomBehavior = d3.zoom()
     .scaleExtent([0.05, 4])
+    .filter((event) => {
+      // Trackpads send a pinch gesture as a wheel event with ctrlKey set,
+      // while a plain two-finger scroll is a wheel event with no ctrlKey.
+      // Only let the pinch gesture drive zoom here; plain scroll is
+      // handled separately below as panning.
+      if (event.type === 'wheel') return event.ctrlKey || event.metaKey;
+      return !event.ctrlKey && !event.button;
+    })
     .on('zoom', (event) => { g.attr('transform', event.transform); });
   svg.call(zoomBehavior);
   currentZoom = zoomBehavior;
+
+  // Plain two-finger trackpad scroll (no ctrl/meta key) pans instead of zooming.
+  svg.on('wheel.pan', (event) => {
+    if (event.ctrlKey || event.metaKey) return; // pinch-zoom, handled above
+    event.preventDefault();
+    const t = d3.zoomTransform(svgEl);
+    zoomBehavior.translateBy(svg, -event.deltaX / t.k, -event.deltaY / t.k);
+  });
 
   const g = svg.append('g');
 

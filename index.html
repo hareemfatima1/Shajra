@@ -412,6 +412,13 @@
     transition: all 0.15s;
   }
   .az-letter:hover { border-color: var(--gold); color: var(--gold); }
+  .az-letter.az-letter-empty {
+    color: var(--text-muted);
+    opacity: 0.35;
+    pointer-events: none;
+    cursor: default;
+  }
+  .az-letter.az-letter-empty:hover { border-color: var(--border); color: var(--text-muted); }
   .glossary-letter-header {
     font-family: 'Cinzel', serif;
     color: var(--gold);
@@ -1251,7 +1258,7 @@ const people = [
 
   // sons of Mahboob Alam
   { id: "2.1.1.3.2.1", nameUr: "اکرام اللہ خان", nameEn: "Akram Ullah Khan", parent: "2.1.1.3.2", gen: 6 },
-  { id: "2.1.1.3.2.2", nameUr: "نصراللہ خان", nameEn: "Nasrullah Khan", parent: "2.1.1.3.2", gen: 6 },
+  { id: "2.1.1.3.2.2", nameUr: "نصراللہ خان", nameEn: "Nusrullah Khan", parent: "2.1.1.3.2", gen: 6 },
   { id: "2.1.1.3.2.3", nameUr: "عبد المجید", nameEn: "Abdul Majeed", parent: "2.1.1.3.2", gen: 6 },
   { id: "2.1.1.3.2.4", nameUr: "عبد الحمید", nameEn: "Abdul Hameed", parent: "2.1.1.3.2", gen: 6 },
 
@@ -1310,7 +1317,7 @@ const people = [
   { id: "2.1.2.2.1", nameUr: "نور دین", nameEn: "Noor Din", parent: "2.1.2.2", gen: 5 },
   { id: "2.1.2.2.2", nameUr: "مظفر الدین", nameEn: "Muzaffar ud Din", parent: "2.1.2.2", gen: 5 },
   { id: "2.1.2.2.2.1", nameUr: "عبد المجید", nameEn: "Abdul Majeed", parent: "2.1.2.2.2", gen: 6 },
-  { id: "2.1.2.2.2.2", nameUr: "نصراللہ", nameEn: "Nasrullah", parent: "2.1.2.2.2", gen: 6 },
+  { id: "2.1.2.2.2.2", nameUr: "نصراللہ", nameEn: "Nusrullah", parent: "2.1.2.2.2", gen: 6 },
   { id: "2.1.2.2.2.1.1", nameUr: "جاوید اختر", nameEn: "Javed Akhtar", parent: "2.1.2.2.2.1", gen: 7 },
   { id: "2.1.2.2.2.1.1.1", nameUr: "ذیشان جاوید", nameEn: "Zeeshan Javed", parent: "2.1.2.2.2.1.1", gen: 8 },
   { id: "2.1.2.2.2.1.1.2", nameUr: "ارسلان جاوید", nameEn: "Arslan Javed", parent: "2.1.2.2.2.1.1", gen: 8 },
@@ -1395,7 +1402,7 @@ const people = [
   { id: "2.1.3.1.1.3.4", nameUr: "عبد الرحمن", nameEn: "Abd ur Rahman", parent: "2.1.3.1.1.3", gen: 7 },
   { id: "2.1.3.1.1.3.2.1", nameUr: "ظفر اللہ", nameEn: "Zafar Ullah", parent: "2.1.3.1.1.3.2", gen: 8 },
   { id: "2.1.3.1.1.3.2.2", nameUr: "اسد اللہ", nameEn: "Asad Ullah", parent: "2.1.3.1.1.3.2", gen: 8 },
-  { id: "2.1.3.1.1.3.2.3", nameUr: "نصراللہ", nameEn: "Nasrullah", parent: "2.1.3.1.1.3.2", gen: 8 },
+  { id: "2.1.3.1.1.3.2.3", nameUr: "نصراللہ", nameEn: "Nusrullah", parent: "2.1.3.1.1.3.2", gen: 8 },
   { id: "2.1.3.1.1.3.2.4", nameUr: "علی", nameEn: "Ali", parent: "2.1.3.1.1.3.2", gen: 8 },
   { id: "2.1.3.1.1.3.3.1", nameUr: "عماد الرحمن", nameEn: "Imad ur Rahman", parent: "2.1.3.1.1.3.3", gen: 8 },
   { id: "2.1.3.1.1.3.3.2", nameUr: "سعد الرحمن", nameEn: "Saad ur Rahman", parent: "2.1.3.1.1.3.3", gen: 8 },
@@ -1587,14 +1594,14 @@ const people = [
   { id: "3.2.2.1", nameUr: "محمد حسین", nameEn: "Muhammad Hussain", parent: "3.2.2", gen: 4 },
   { id: "3.2.2.1.1", nameUr: "سردار خان", nameEn: "Sardar Khan", parent: "3.2.2.1", gen: 5 },
   { id: "3.2.2.1.1.1", nameUr: "عطاء اللہ", nameEn: "Ataullah", parent: "3.2.2.1.1", gen: 6 },
-  { id: "3.2.2.1.2", nameUr: "نصراللہ خان", nameEn: "Nasrullah Khan", parent: "3.2.2.1", gen: 5 },
+  { id: "3.2.2.1.2", nameUr: "نصراللہ خان", nameEn: "Nusrullah Khan", parent: "3.2.2.1", gen: 5 },
   { id: "3.2.2.1.2.1", nameUr: "ہمایوں ظفر", nameEn: "Humayun Zafar", parent: "3.2.2.1.2", gen: 6 },
-  { id: "3.2.2.1.2.1.1", nameUr: "حسن نصراللہ", nameEn: "Hassan Nasrullah", parent: "3.2.2.1.2.1", gen: 7 },
+  { id: "3.2.2.1.2.1.1", nameUr: "حسن نصراللہ", nameEn: "Hassan Nusrullah", parent: "3.2.2.1.2.1", gen: 7 },
   { id: "3.2.2.1.2.1.1.1", nameUr: "حمزہ ہمایوں", nameEn: "Hamza Humayun", parent: "3.2.2.1.2.1.1", gen: 8 },
-  { id: "3.2.2.1.2.1.2", nameUr: "سعد نصراللہ", nameEn: "Saad Nasrullah", parent: "3.2.2.1.2.1", gen: 7 },
+  { id: "3.2.2.1.2.1.2", nameUr: "سعد نصراللہ", nameEn: "Saad Nusrullah", parent: "3.2.2.1.2.1", gen: 7 },
   { id: "3.2.2.1.2.1.2.1", nameUr: "احمد ہمایوں", nameEn: "Ahmad Humayun", parent: "3.2.2.1.2.1.2", gen: 8 },
-  { id: "3.2.2.1.2.1.3", nameUr: "عمر نصراللہ", nameEn: "Umer Nasrullah", parent: "3.2.2.1.2.1", gen: 7 },
-  { id: "3.2.2.1.2.1.4", nameUr: "محسن نصراللہ", nameEn: "Mohsin Nasrullah", parent: "3.2.2.1.2.1", gen: 7 },
+  { id: "3.2.2.1.2.1.3", nameUr: "عمر نصراللہ", nameEn: "Omer Nusrullah", parent: "3.2.2.1.2.1", gen: 7 },
+  { id: "3.2.2.1.2.1.4", nameUr: "محسن نصراللہ", nameEn: "Mohsin Nusrullah", parent: "3.2.2.1.2.1", gen: 7 },
   { id: "3.2.2.1.2.1.4.1", nameUr: "ہمایوں محسن", nameEn: "Humayun Mohsin", parent: "3.2.2.1.2.1.4", gen: 8 },
   { id: "3.2.2.1.2.2", nameUr: "محمد نواز خالد", nameEn: "Muhammad Nawaz Khalid", parent: "3.2.2.1.2", gen: 6 },
   { id: "3.2.2.1.2.2.1", nameUr: "امیر شعیب", nameEn: "Amir Shuaib", parent: "3.2.2.1.2.2", gen: 7 },
@@ -2141,9 +2148,15 @@ function renderGlossary() {
   const azJump = document.getElementById("azJump");
 
   const sorted = [...people].sort((a, b) => a.nameEn.localeCompare(b.nameEn, "en", { sensitivity: "base" }));
-  const letters = [...new Set(sorted.map(p => p.nameEn[0].toUpperCase()))].sort();
+  const lettersWithNames = new Set(sorted.map(p => p.nameEn[0].toUpperCase()));
+  const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-  azJump.innerHTML = letters.map(l => `<a href="#glos-${l}" class="az-letter">${l}</a>`).join("");
+  azJump.innerHTML = allLetters.map(l => {
+    const hasNames = lettersWithNames.has(l);
+    return hasNames
+      ? `<a href="#glos-${l}" class="az-letter">${l}</a>`
+      : `<span class="az-letter az-letter-empty" title="No names starting with ${l}">${l}</span>`;
+  }).join("");
 
   let html = "";
   let currentLetter = "";
@@ -2236,7 +2249,7 @@ function switchView(mode) {
   browseEls.forEach(id => document.getElementById(id).style.display = (mode === 'browse') ? '' : 'none');
   treeEls.forEach(id => document.getElementById(id).style.display = (mode === 'tree') ? 'block' : 'none');
   glossaryEls.forEach(id => document.getElementById(id).style.display = (mode === 'glossary') ? 'block' : 'none');
-  searchEl.style.display = (mode === 'tree') ? 'none' : '';
+  searchEl.style.display = (mode === 'tree' || mode === 'glossary') ? 'none' : '';
   profileEl.style.display = 'none';
 
   document.getElementById('btnBrowse').classList.toggle('active', mode === 'browse');
